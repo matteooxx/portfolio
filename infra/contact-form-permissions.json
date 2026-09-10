@@ -1,0 +1,17 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "WriteContactSubmissions",
+      "Effect": "Allow",
+      "Action": "dynamodb:PutItem",
+      "Resource": "arn:aws:dynamodb:${AWS_REGION}:${AWS_ACCOUNT_ID}:table/${TABLE_NAME}"
+    },
+    {
+      "Sid": "SendTemplatedEmail",
+      "Effect": "Allow",
+      "Action": "ses:SendTemplatedEmail",
+      "Resource": "*"
+    }
+  ]
+}

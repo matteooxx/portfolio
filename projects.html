@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Projects by Matteo Mastore across cloud architecture, platform engineering, AI systems, reliability, and full-stack product delivery.">
+  <meta name="theme-color" content="#11171a">
+  <title>Projects - Matteo Mastore</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a class="brand" href="index.html" aria-label="Matteo Mastore home">
+        <span class="brand-mark" aria-hidden="true">MM</span>
+        <span class="brand-name">Matteo Mastore</span>
+      </a>
+      <button class="icon-button nav-toggle" type="button" aria-label="Open navigation" aria-controls="site-nav" aria-expanded="false" title="Menu">
+        <i data-lucide="menu" aria-hidden="true"></i>
+      </button>
+      <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="experience.html">Experience</a>
+        <a href="projects.html">Projects</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="page-intro page-intro-green">
+      <div class="container page-intro-grid">
+        <div>
+          <p class="eyebrow">Projects</p>
+          <h1>Products, platforms, and architecture under real constraints.</h1>
+        </div>
+        <p class="page-intro-copy">
+          Personal projects are described in the first person. Group work keeps
+          attribution explicit, and prototypes are separated from deployed systems.
+          No adoption, performance, or business metrics are invented.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="project-toolbar">
+          <div class="segmented-control" role="group" aria-label="Filter projects">
+            <button type="button" data-project-filter="all" aria-pressed="true">All</button>
+            <button type="button" data-project-filter="personal" aria-pressed="false">Personal</button>
+            <button type="button" data-project-filter="cloud" aria-pressed="false">Cloud</button>
+            <button type="button" data-project-filter="group" aria-pressed="false">Group</button>
+          </div>
+          <p id="projectCount" class="project-count" aria-live="polite">9 projects</p>
+        </div>
+
+        <div class="projects-grid">
+          <article class="project-card project-card-wide reveal" data-project-card data-category="personal cloud infrastructure">
+            <a class="project-image-link" href="assets/king-meal-prep.png" target="_blank" rel="noopener" aria-label="Open King of Meal Prep preview">
+              <img src="assets/king-meal-prep.png" alt="King of Meal Prep daily planning interface with meals and nutrition targets">
+              <span class="image-action" aria-hidden="true"><i data-lucide="expand"></i></span>
+            </a>
+            <div class="project-card-body">
+              <div class="project-meta">
+                <span>Personal product</span>
+                <span>2026</span>
+              </div>
+              <h2>King of Meal Prep</h2>
+              <p>
+                Designed and built a private kitchen operations platform that connects
+                weekly planning, recipes, pantry stock, prepared portions, shopping,
+                nutrition, guided cooking, barcode and receipt review, feedback, and recovery.
+              </p>
+              <ul class="project-points">
+                <li>Models cooking and inventory as idempotent transactions with compensating undo movements and tested schema migrations.</li>
+                <li>Preserves missing nutrition, source, confidence, and review state instead of presenting uncertain data as fact.</li>
+                <li>Runs locally through Docker with authentication, portable exports, encrypted backups, staged restore, and automated checks.</li>
+              </ul>
+              <p class="stack-line">Python, Flask, SQLite, Docker, PWA, transactional data modelling</p>
+            </div>
+          </article>
+
+          <article class="project-card project-card-wide reveal" data-project-card data-category="personal cloud">
+            <a class="project-image-link" href="assets/recsbot-interface.png" target="_blank" rel="noopener" aria-label="Open recsbot preview">
+              <img src="assets/recsbot-interface.png" alt="recsbot authenticated recommendation chat interface in local mode">
+              <span class="image-action" aria-hidden="true"><i data-lucide="expand"></i></span>
+            </a>
+            <div class="project-card-body">
+              <div class="project-meta">
+                <span>Personal product</span>
+                <span>2026</span>
+              </div>
+              <h2>recsbot Recommendation Product</h2>
+              <p>
+                Built a local-first recommendation product with a FastAPI streaming backend
+                and authenticated Flask interface for conversations, preferences, feedback,
+                and optional read-only media context.
+              </p>
+              <ul class="project-points">
+                <li>Preserves a stable Server-Sent Events contract across the backend proxy and browser.</li>
+                <li>Uses interchangeable SQLite/DynamoDB, deterministic/Ollama/managed-model, and local/managed-secret adapters.</li>
+                <li>Defaults to loopback, keeps secrets and history outside source, and degrades cleanly when optional integrations are unavailable.</li>
+              </ul>
+              <p class="stack-line">FastAPI, Flask, SSE, SQLite, DynamoDB, Ollama, Docker</p>
+            </div>
+          </article>
+
+          <article class="project-card reveal" data-project-card data-category="personal cloud">
+            <div class="project-diagram diagram-blue" aria-label="Taste Platform flow">
+              <span>Ratings + tags</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>Deterministic scoring</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>Recommendations</span>
+            </div>
+            <div class="project-card-body">
+              <div class="project-meta">
+                <span>Personal architecture</span>
+                <span>2026</span>
+              </div>
+              <h2>Taste Platform</h2>
+              <p>A cross-media taste profile and recommendation API spanning movies, shows, anime, games, and music.</p>
+              <ul class="project-points">
+                <li>Built a provider-free Python/SQLite runtime with deterministic scoring and optional Ollama responses.</li>
+                <li>Designed a parameterised CDK cloud reference while keeping account, role, model, and endpoint values out of source.</li>
+              </ul>
+              <p class="stack-line">Python, SQLite, Ollama, AWS CDK, Lambda, DynamoDB</p>
+            </div>
+          </article>
+
+          <article class="project-card reveal" data-project-card data-category="personal infrastructure cloud">
+            <div class="project-diagram diagram-ink" aria-label="Home server platform layers">
+              <span>ZFS storage</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>Private services</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>Recovery</span>
+            </div>
+            <div class="project-card-body">
+              <div class="project-meta">
+                <span>Private infrastructure</span>
+                <span>2025-present</span>
+              </div>
+              <h2>Home Server NAS Platform</h2>
+              <p>Operate a private TrueNAS SCALE platform for redundant storage, self-hosted services, and controlled remote access.</p>
+              <ul class="project-points">
+                <li>Maintain ZFS storage, snapshots, scheduled backups, SMART diagnostics, dataset permissions, and recovery runbooks.</li>
+                <li>Run containerised services behind private networking with health checks and bounded recovery procedures.</li>
+              </ul>
+              <p class="stack-line">TrueNAS SCALE, ZFS, Docker, Tailscale, Linux, monitoring</p>
+            </div>
+          </article>
+
+          <article class="project-card reveal" data-project-card data-category="group cloud infrastructure">
+            <div class="project-diagram diagram-coral" aria-label="IoT traffic pipeline">
+              <span>Traffic events</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>Kafka services</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>AKS + telemetry</span>
+            </div>
+            <div class="project-card-body">
+              <div class="project-meta">
+                <span>University group project</span>
+                <span>2025</span>
+              </div>
+              <h2>IoT Traffic Control System</h2>
+              <p>Led infrastructure and observability for a microservices traffic-data pipeline and its move to Azure Kubernetes Service.</p>
+              <ul class="project-points">
+                <li>Automated publication of more than 10 container images and managed environment overlays with Kustomize and ArgoCD.</li>
+                <li>Implemented centralised logging and dashboards and resolved cloud-only image and ephemeral credential failures.</li>
+              </ul>
+              <p class="stack-line">AKS, Docker, Kafka, Redis, Grafana, Loki, ArgoCD, Kustomize</p>
+            </div>
+          </article>
+
+          <article class="project-card reveal" data-project-card data-category="group">
+            <div class="project-diagram diagram-violet" aria-label="Tensei support workspace flow">
+              <span>Customer symptoms</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>AI translator</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>Engineer context</span>
+            </div>
+            <div class="project-card-body">
+              <div class="project-meta">
+                <span>Six-person group project</span>
+                <span>2026</span>
+              </div>
+              <h2>Tensei AI Support Workspace</h2>
+              <p>Designed key conversational-support concepts and built the interactive prototype for a shared customer, AI, and engineer workspace.</p>
+              <ul class="project-points">
+                <li>Owned the doctor-model intake, three resolution paths, and AI-as-translator concept.</li>
+                <li>Built and deployed a ten-screen React/TypeScript prototype with progressive consent, visible investigation, and context-preserving handoff.</li>
+              </ul>
+              <p class="stack-line">React, TypeScript, Vite, Tailwind CSS, Framer Motion</p>
+            </div>
+          </article>
+
+          <article class="project-card reveal" data-project-card data-category="group cloud">
+            <div class="project-diagram diagram-green" aria-label="SafeZone high-level integration">
+              <span>React journeys</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>Shared API</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>Serverless domains</span>
+            </div>
+            <div class="project-card-body">
+              <div class="project-meta">
+                <span>Five-person internship project</span>
+                <span>2026</span>
+              </div>
+              <h2>SafeZone Crisis Response</h2>
+              <p>Served as Platform and Frontend Integration owner for a demo-ready community crisis-response prototype.</p>
+              <ul class="project-points">
+                <li>Integrated independently owned React pages through coherent routing and responsive navigation.</li>
+                <li>Coordinated the shared API and authentication boundary, static delivery workstream, final demo flow, and architecture / AI-trust narrative.</li>
+              </ul>
+              <p class="stack-line">React, JavaScript, serverless architecture, API integration, static cloud delivery</p>
+            </div>
+          </article>
+
+          <article class="project-card reveal" data-project-card data-category="group cloud">
+            <div class="project-diagram diagram-blue" aria-label="Project ARIA safety paths">
+              <span>Language paths</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>Edge fallback</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>Human handoff</span>
+            </div>
+            <div class="project-card-body">
+              <div class="project-meta">
+                <span>Group architecture concept</span>
+                <span>2026</span>
+              </div>
+              <h2>Project ARIA</h2>
+              <p>Contributed multilingual, edge/offline, and safety analysis to an accessible healthcare-intake kiosk simulation.</p>
+              <ul class="project-points">
+                <li>Evaluated language and voice support, regional model availability, cross-region data constraints, and edge assumptions.</li>
+                <li>Helped replace a universal-pipeline assumption with language-specific paths, explicit degradation, and human escalation.</li>
+              </ul>
+              <p class="stack-line">HTML, CSS, JavaScript, failure simulation, accessibility, edge/cloud architecture</p>
+            </div>
+          </article>
+
+          <article class="project-card reveal" data-project-card data-category="personal cloud">
+            <div class="project-diagram diagram-ink" aria-label="Portfolio hosting modes">
+              <span>Static site</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>Local contact API</span>
+              <i data-lucide="arrow-right" aria-hidden="true"></i>
+              <span>Private SQLite</span>
+            </div>
+            <div class="project-card-body">
+              <div class="project-meta">
+                <span>Personal product</span>
+                <span>2026</span>
+              </div>
+              <h2>This Portfolio</h2>
+              <p>A responsive, provider-independent site with a static email fallback and optional same-origin Python contact service.</p>
+              <ul class="project-points">
+                <li>Separates public website files from private submissions, applies validation and rate limits, and expires locally stored contact data.</li>
+                <li>Retains optional cloud architecture as an explicit deployment path rather than a local-development dependency.</li>
+              </ul>
+              <p class="stack-line">HTML, CSS, JavaScript, Python, SQLite, static hosting</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="project-boundary">
+      <div class="container boundary-grid">
+        <i data-lucide="shield-check" aria-hidden="true"></i>
+        <div>
+          <h2>Publication boundaries matter.</h2>
+          <p>SafeZone is presented only through a high-level public narrative. Tensei and Project ARIA remain explicitly attributed group work; their private repositories and internal artifacts are not linked here.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand footer-brand" href="index.html">
+          <span class="brand-mark" aria-hidden="true">MM</span>
+          <span class="brand-name">Matteo Mastore</span>
+        </a>
+        <p>Cloud, platform, AI, and reliability engineering.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <a href="about.html">About</a>
+        <a href="experience.html">Experience</a>
+        <a href="projects.html">Projects</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <div class="social-links">
+        <a class="icon-button" href="https://github.com/matteooxx" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub"><i data-lucide="github" aria-hidden="true"></i></a>
+        <a class="icon-button" href="https://www.linkedin.com/in/matteo-mastore" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn"><i data-lucide="linkedin" aria-hidden="true"></i></a>
+        <a class="icon-button" href="mailto:matteo.mastore.job@gmail.com" aria-label="Email" title="Email"><i data-lucide="mail" aria-hidden="true"></i></a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; <span data-year></span> Matteo Mastore</span>
+      <span>Dublin, Ireland</span>
+    </div>
+  </footer>
+
+  <script src="assets/lucide.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

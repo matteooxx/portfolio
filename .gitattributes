@@ -1,0 +1,13 @@
+# Normalise line endings so that a checkout on Windows cannot introduce CRLF
+# into shell scripts, HTML, CSS or JavaScript that are served or executed on
+# Linux.
+* text=auto eol=lf
+
+# Binary assets must never be converted.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.zip binary

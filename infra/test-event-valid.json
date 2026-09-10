@@ -1,0 +1,3 @@
+{
+  "body": "{\"name\":\"Test User\",\"email\":\"test@example.com\",\"subject\":\"Lambda smoke test\",\"message\":\"This is a local validation fixture.\"}"
+}

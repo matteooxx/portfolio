@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "RateLimitPerIP",
+    "Priority": 1,
+    "Action": { "Block": {} },
+    "Statement": {
+      "RateBasedStatement": {
+        "Limit": 100,
+        "EvaluationWindowSec": 300,
+        "AggregateKeyType": "IP"
+      }
+    },
+    "VisibilityConfig": {
+      "SampledRequestsEnabled": true,
+      "CloudWatchMetricsEnabled": true,
+      "MetricName": "RateLimitPerIP"
+    }
+  }
+]
