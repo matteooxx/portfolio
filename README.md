@@ -58,21 +58,24 @@ privacy boundary for phone and CV data.
 
 ## Deployment
 
-Cloudflare Pages Direct Upload is the selected public-hosting path. It publishes
-only an explicit static allowlist and leaves the contact form in mailto mode.
-It does not expose the NAS or require AWS.
+The public site runs on Cloudflare Workers Static Assets and is deployed by
+Workers Builds from the `main` branch of this repository. Each build runs
+`bash scripts/build-cloudflare-pages.sh`, which copies only the explicit static
+allowlist and `cloudflare/_headers` into `dist/cloudflare-pages/`;
+`wrangler.jsonc` publishes that directory and nothing else. The contact form
+stays in mailto mode, and the site does not expose the NAS or require AWS.
 
 ```bash
+make check
 make cloudflare-build
-make cloudflare-bundle
 ```
 
-The second command creates a dashboard-ready ZIP under
-`dist/cloudflare-pages-ready/`. Cloudflare account login and first project
-creation are operator steps in the Cloudflare dashboard or with Wrangler;
-`scripts/deploy-cloudflare-pages.sh` never starts OAuth or creates a project.
-Validate every page, asset, security header, and the contact fallback on the
-`*.pages.dev` hostname before routing any other domain to it.
+`make cloudflare-build` reproduces the published tree locally. Cloudflare
+account login, the GitHub connection, and custom domains are operator steps in
+the Cloudflare dashboard. Validate every page, asset, security header, and the
+contact fallback on the `*.workers.dev` hostname before routing a custom domain
+to it. `make cloudflare-bundle` still produces a ZIP for a manual upload if one
+is ever needed.
 
 The optional historical AWS reference path remains in `infra/`, `lambda/`, and
 `scripts/deploy.sh`; it is not used by the Cloudflare deployment.

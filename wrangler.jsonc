@@ -1,0 +1,13 @@
+{
+  // Assets-only Worker: no script runs, Cloudflare serves the static build.
+  // Workers Builds runs `bash scripts/build-cloudflare-pages.sh` first, which
+  // copies only the public allowlist and cloudflare/_headers into the
+  // directory below. Never point it at the repository root.
+  "name": "matteo-mastore-portfolio",
+  "compatibility_date": "2026-09-10",
+  "assets": {
+    "directory": "./dist/cloudflare-pages",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}

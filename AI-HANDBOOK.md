@@ -82,15 +82,16 @@ Run working-tree and history secret scans before publication. Publish only the
 sanitized `main` branch. Keep deployment state, credentials, contact data,
 private career documents, and generated archives out of Git.
 
-Cloudflare Pages Direct Upload is the approved public architecture. Build or
-deploy only the explicit static allowlist produced by
-`scripts/build-cloudflare-pages.sh`; never upload the repository root. Do not
-add a telephone number or downloadable CV to a public export.
+Cloudflare Workers Static Assets, deployed by Workers Builds from `main`, is
+the approved public architecture. `wrangler.jsonc` must keep
+`assets.directory` pointed at the output of `scripts/build-cloudflare-pages.sh`;
+never point it at the repository root. Do not add a Worker script, Pages
+Functions, or a public API, and do not add a telephone number or downloadable
+CV to a public export.
 
-Cloudflare login and account selection require the operator. The deployment
-script verifies existing authentication but never starts OAuth or creates a
-Pages project. Keep Wrangler credentials in the operator's OS keychain, never
-in this repository or any deployment bundle.
+Cloudflare login, the GitHub connection, and custom domains require the
+operator. Keep Wrangler and API credentials out of this repository, its build
+variables, and any deployment bundle.
 
 Host-specific operations, such as retiring an earlier self-hosted route, live
 in the operator's private runbook and not in this repository. Cloudflare
