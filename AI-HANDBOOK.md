@@ -37,8 +37,11 @@ The public pages are:
   latency, cost, availability, customer, or business-impact metrics.
 - Training and exam preparation are not earned certifications. Do not mention
   AWS certification preparation.
-- Degree coursework and exams finished in May 2026; the BSc is conferred in
-  October 2026. Availability to start immediately may be stated.
+- The degree is the three-year NFQ Level 7 BSc in Computing Systems and
+  Operations (Software Development and DevOps): coursework and exams finished
+  in May 2026 and it is conferred in October 2026. Never call it an Honours
+  degree. The AWS internship was its Stage 3 work placement. Availability to
+  start immediately may be stated.
 - The AWS internship ended in August 2026 and may be described as completed.
   Collaboration with EMEA and Americas teams is supported; formal on-call or
   incident ownership is not.
@@ -47,8 +50,15 @@ The public pages are:
   defect fixes). CI/CD and ArgoCD belonged to teammates. Never claim GitOps
   ownership or leading the infrastructure workstream.
 - Do not list OpenAI APIs; the evidenced model integrations are Ollama and
-  Bedrock concepts. Ansible and Wireshark come from coursework and belong in
-  skills lists only.
+  Bedrock concepts.
+- Coursework skills come from the official DkIT module descriptors for the
+  three completed stages (read on 11 September 2026). They belong in skills
+  lists and the education section only, never in project or employment
+  claims. The operator confirmed hands-on coursework use of Terraform,
+  CloudWatch, EventBridge, SNS, CloudTrail, AWS Config, VPC Flow Logs, ELK,
+  Fluentd, and Prometheus; other tools the descriptors name only as examples
+  (such as Nmap, Scrapy, and boto3) stay off the site, and Stage 4 modules
+  were not taken.
 - Source links may point only to the public personal repositories
   `king-of-meal-prep`, `recsbot`, `taste-platform`, and `portfolio`. Never link
   group, private, or legacy repositories.

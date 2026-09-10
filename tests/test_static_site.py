@@ -88,8 +88,24 @@ class StaticSiteTests(unittest.TestCase):
             "Led infrastructure and observability",
             "Final-year",
             "expected October 2026",
+            "(Hons)",
+            "Honours",
         )
         for phrase in corrected:
+            self.assertNotIn(phrase, text)
+
+    def test_unconfirmed_tools_and_untaken_modules_are_absent(self) -> None:
+        text = "\n".join(
+            (ROOT / page).read_text(encoding="utf-8") for page in PAGES
+        )
+        unconfirmed = (
+            "Nmap",
+            "Scrapy",
+            "boto3",
+            "Programmable Networks",
+            "Data Centre Environment",
+        )
+        for phrase in unconfirmed:
             self.assertNotIn(phrase, text)
 
     def test_source_links_point_only_to_public_personal_repositories(
