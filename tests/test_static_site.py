@@ -78,6 +78,36 @@ class StaticSiteTests(unittest.TestCase):
         for phrase in stale:
             self.assertNotIn(phrase, text)
 
+    def test_corrected_claims_stay_corrected(self) -> None:
+        text = "\n".join(
+            (ROOT / page).read_text(encoding="utf-8") for page in PAGES
+        )
+        corrected = (
+            "OpenAI",
+            "ArgoCD",
+            "Led infrastructure and observability",
+            "Final-year",
+            "expected October 2026",
+        )
+        for phrase in corrected:
+            self.assertNotIn(phrase, text)
+
+    def test_source_links_point_only_to_public_personal_repositories(
+        self,
+    ) -> None:
+        allowed = {"king-of-meal-prep", "recsbot", "taste-platform", "portfolio"}
+        for page_name in PAGES:
+            parser = ReferenceParser()
+            parser.feed((ROOT / page_name).read_text(encoding="utf-8"))
+            for reference in parser.references:
+                parsed = urlsplit(reference)
+                if parsed.netloc != "github.com":
+                    continue
+                parts = [part for part in parsed.path.split("/") if part]
+                self.assertEqual(parts[:1], ["matteooxx"], reference)
+                if len(parts) > 1:
+                    self.assertIn(parts[1], allowed, f"{page_name}: {reference}")
+
     def test_group_and_safezone_boundaries_are_visible(self) -> None:
         projects = (ROOT / "projects.html").read_text(encoding="utf-8")
         self.assertIn("Five-person internship project", projects)

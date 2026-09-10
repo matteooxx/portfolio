@@ -1,13 +1,14 @@
 # Portfolio
 
 Matteo Mastore's static multi-page portfolio, refreshed from evidence-backed
-career briefings on 14 August 2026.
+career briefings and canonical CV facts on 11 September 2026.
 
 The site covers:
 
-- cloud, platform, SRE, AI solutions, and solutions architecture positioning;
+- solutions architecture, solutions engineering, cloud, platform, and
+  AI-assisted engineering positioning;
 - AWS, infrastructure-maintenance, and AI-review experience;
-- personal projects with first-person ownership;
+- personal projects with first-person ownership and public source links;
 - explicitly attributed internship, university, and group projects.
 
 Project screenshots use disposable local databases and synthetic content. They

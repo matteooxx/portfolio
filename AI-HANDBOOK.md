@@ -6,8 +6,8 @@ Read this file before changing or publishing the project.
 
 This personal project is a public-ready static portfolio with an optional
 provider-free local contact service and an optional historical cloud reference
-path. Content was refreshed from the NAS career briefings and targeted CV set
-through 14 August 2026.
+path. Content was refreshed from the NAS career briefings, the canonical
+targeted-CV facts, and the LinkedIn audit through 11 September 2026.
 
 The public pages are:
 
@@ -35,7 +35,23 @@ The public pages are:
 - Tensei and Project ARIA repositories remain private pending rights approval.
 - A prototype is not a production service. Do not invent adoption, accuracy,
   latency, cost, availability, customer, or business-impact metrics.
-- Training and exam preparation are not earned certifications.
+- Training and exam preparation are not earned certifications. Do not mention
+  AWS certification preparation.
+- Degree coursework and exams finished in May 2026; the BSc is conferred in
+  October 2026. Availability to start immediately may be stated.
+- The AWS internship ended in August 2026 and may be described as completed.
+  Collaboration with EMEA and Americas teams is supported; formal on-call or
+  incident ownership is not.
+- IoT Traffic Control: Matteo owned the data and observability layer and the
+  AKS deployment (Python image automation, Kustomize overlays, two cloud-only
+  defect fixes). CI/CD and ArgoCD belonged to teammates. Never claim GitOps
+  ownership or leading the infrastructure workstream.
+- Do not list OpenAI APIs; the evidenced model integrations are Ollama and
+  Bedrock concepts. Ansible and Wireshark come from coursework and belong in
+  skills lists only.
+- Source links may point only to the public personal repositories
+  `king-of-meal-prep`, `recsbot`, `taste-platform`, and `portfolio`. Never link
+  group, private, or legacy repositories.
 
 ## Visual Assets
 
