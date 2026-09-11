@@ -1374,6 +1374,22 @@ small {
   color: var(--error);
 }
 
+.turnstile-field {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+#contact-turnstile {
+  min-height: 65px;
+}
+
+.form-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
 .site-footer {
   flex: 0 0 auto;
   padding: 52px 0 22px;

@@ -94,6 +94,10 @@
             <textarea id="message" name="message" rows="7" maxlength="5000" required></textarea>
             <span class="field-error" data-error-for="message"></span>
           </div>
+          <div class="turnstile-field">
+            <div id="contact-turnstile" data-sitekey="0x4AAAAAAEvlhR-avVdWCRPU"></div>
+            <p class="form-note">Protected by Cloudflare Turnstile. Your message is emailed to Matteo and is not stored on this site.</p>
+          </div>
           <div class="form-actions">
             <button type="submit" class="button button-primary button-submit">
               Send message
@@ -136,5 +140,6 @@
   <script src="contact-config.js"></script>
   <script src="assets/lucide.min.js"></script>
   <script src="script.js"></script>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&amp;onload=onPortfolioTurnstileLoad" async defer></script>
 </body>
 </html>

@@ -77,12 +77,22 @@ Lucide 0.468.0 is bundled at `assets/lucide.min.js` under the ISC license.
 
 ## Contact Modes
 
-Static hosting leaves `window.PORTFOLIO_CONTACT_ENDPOINT` empty. Valid form
-submissions open a prefilled email draft; no data is posted.
+The public site posts the contact form to `/api/contact`, handled by the
+Cloudflare Worker in `worker/index.mjs`. Only `/api/*` runs the Worker
+(`run_worker_first`); every page and asset is still served statically. The
+Worker accepts JSON from the `ALLOWED_ORIGINS` origin only, applies the same
+field rules and limits as `local_server.py`, verifies a Cloudflare Turnstile
+token (action `contact`, hostname in `TURNSTILE_HOSTNAMES`), and emails the
+message through the `CONTACT_EMAIL` send_email binding, which can reach only
+the single verified destination address. It stores nothing and logs no message
+content or addresses.
 
-`local_server.py` serves the same files and dynamically returns
-`/api/contact` from `contact-config.js`. It validates, rate-limits, and stores
-submissions in private SQLite storage outside the document root.
+`contact-config.js` keeps `window.PORTFOLIO_CONTACT_ENDPOINT = "/api/contact"`.
+An empty value restores the mailto draft for a host without the Worker.
+
+`local_server.py` serves the same files and handles `/api/contact` locally. It
+validates, rate-limits, and stores submissions in private SQLite storage
+outside the document root; it does not verify Turnstile.
 
 Never commit contact submissions, runtime databases, deployment logs, or
 visitor data. A public backend must not be claimed as live unless its actual
@@ -98,8 +108,8 @@ python3 local_server.py
 ```
 
 Then verify desktop and mobile layouts, active navigation, menu keyboard
-behavior, project filters, full-size screenshots, static email fallback, local
-contact submission, focus visibility, reduced motion, the browser console, and
+behavior, project filters, full-size screenshots, one real contact message on
+the live site, local contact submission, focus visibility, reduced motion, the browser console, and
 that no phone number or CV download is published.
 
 ## Publication
@@ -111,9 +121,15 @@ private career documents, and generated archives out of Git.
 Cloudflare Workers Static Assets, deployed by Workers Builds from `main`, is
 the approved public architecture. `wrangler.jsonc` must keep
 `assets.directory` pointed at the output of `scripts/build-cloudflare-pages.sh`;
-never point it at the repository root. Do not add a Worker script, Pages
-Functions, or a public API, and do not add a telephone number or downloadable
-CV to a public export.
+never point it at the repository root. The only server-side code is
+`worker/index.mjs` behind `/api/*`: do not add other routes, storage, Pages
+Functions, or third-party form services without the operator's approval, and
+do not add a telephone number or downloadable CV to a public export.
+
+The Turnstile secret lives only as the Worker secret `TURNSTILE_SECRET_KEY`.
+Email Routing on the zone, the verified destination address, and the
+Turnstile widget (Managed mode, hostname `matteomastore.com`, public sitekey in
+`contact.html`) are operator-managed in the Cloudflare dashboard.
 
 Cloudflare login, the GitHub connection, and custom domains require the
 operator. Keep Wrangler and API credentials out of this repository, its build

@@ -4,6 +4,26 @@
   var CONTACT_API_URL = String(window.PORTFOLIO_CONTACT_ENDPOINT || "").trim();
   var CONTACT_EMAIL = "matteo.mastore.job@gmail.com";
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var SEND_FAILED_MESSAGE =
+    "The message could not be sent. Please email " + CONTACT_EMAIL + " directly.";
+  var turnstileWidgetId = null;
+  var turnstileFailed = false;
+
+  // Turnstile's api.js is loaded with render=explicit and calls this when ready.
+  // If the widget cannot run (blocked script, unregistered local host), the
+  // form still submits and the server decides.
+  window.onPortfolioTurnstileLoad = function () {
+    var slot = document.getElementById("contact-turnstile");
+    if (!slot || !window.turnstile) return;
+    turnstileWidgetId = window.turnstile.render(slot, {
+      sitekey: slot.getAttribute("data-sitekey"),
+      action: "contact",
+      size: "flexible",
+      "error-callback": function () {
+        turnstileFailed = true;
+      },
+    });
+  };
 
   document.addEventListener("DOMContentLoaded", function () {
     setYear();
@@ -190,6 +210,12 @@
       return;
     }
 
+    data.turnstileToken = turnstileToken();
+    if (turnstileWidgetId !== null && !turnstileFailed && !data.turnstileToken) {
+      setStatus(status, "Please complete the verification check, then send again.", "error");
+      return;
+    }
+
     submit.disabled = true;
     setStatus(status, "Sending message...", "");
 
@@ -215,11 +241,29 @@
         return;
       }
 
-      setStatus(status, "The message could not be sent. Please email me directly.", "error");
+      if (response.status === 403 && payload.error === "verification_failed") {
+        setStatus(status, "The verification check failed. Please try again.", "error");
+        return;
+      }
+
+      setStatus(status, SEND_FAILED_MESSAGE, "error");
     } catch (_error) {
-      setStatus(status, "The message could not be sent. Please email me directly.", "error");
+      setStatus(status, SEND_FAILED_MESSAGE, "error");
     } finally {
       submit.disabled = false;
+      resetTurnstile();
+    }
+  }
+
+  function turnstileToken() {
+    if (turnstileWidgetId === null || !window.turnstile) return "";
+    return window.turnstile.getResponse(turnstileWidgetId) || "";
+  }
+
+  // Turnstile tokens are single-use: get a fresh one after every attempt.
+  function resetTurnstile() {
+    if (turnstileWidgetId !== null && window.turnstile) {
+      window.turnstile.reset(turnstileWidgetId);
     }
   }
 

@@ -1,13 +1,37 @@
 {
-  // Assets-only Worker: no script runs, Cloudflare serves the static build.
-  // Workers Builds runs `bash scripts/build-cloudflare-pages.sh` first, which
-  // copies only the public allowlist and cloudflare/_headers into the
-  // directory below. Never point it at the repository root.
+  // Static pages are served straight from the assets directory below, which
+  // Workers Builds fills by running `bash scripts/build-cloudflare-pages.sh`
+  // (only the public allowlist and cloudflare/_headers). Never point it at the
+  // repository root.
+  //
+  // Only /api/* runs worker/index.mjs first. POST /api/contact verifies a
+  // Turnstile token and emails the message through CONTACT_EMAIL, a
+  // send_email binding that can reach one verified destination address. The
+  // Turnstile secret is the Worker secret TURNSTILE_SECRET_KEY; it is never
+  // stored in this repository.
   "name": "matteo-mastore-portfolio",
+  "main": "./worker/index.mjs",
   "compatibility_date": "2026-09-10",
   "assets": {
     "directory": "./dist/cloudflare-pages",
+    "binding": "ASSETS",
     "not_found_handling": "404-page",
-    "html_handling": "auto-trailing-slash"
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": ["/api/*"]
+  },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://matteomastore.com",
+    "TURNSTILE_HOSTNAMES": "matteomastore.com",
+    "CONTACT_FROM": "contact@matteomastore.com",
+    "CONTACT_TO": "matteo.mastore.job@gmail.com"
+  },
+  "send_email": [
+    {
+      "name": "CONTACT_EMAIL",
+      "destination_address": "matteo.mastore.job@gmail.com"
+    }
+  ],
+  "observability": {
+    "enabled": true
   }
 }

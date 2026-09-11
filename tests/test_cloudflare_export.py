@@ -50,14 +50,16 @@ class CloudflareExportTests(unittest.TestCase):
             private_cv_name = "-".join(("cv", "matteo", "mastore")) + ".pdf"
             self.assertFalse((output / private_cv_name).exists())
             self.assertIn(
-                'window.PORTFOLIO_CONTACT_ENDPOINT = "";',
+                'window.PORTFOLIO_CONTACT_ENDPOINT = "/api/contact";',
                 (output / "contact-config.js").read_text(encoding="utf-8"),
             )
 
             headers = (output / "_headers").read_text(encoding="utf-8")
             for required in (
                 "Content-Security-Policy:",
-                "connect-src 'none'",
+                "connect-src 'self'",
+                "frame-src https://challenges.cloudflare.com",
+                "script-src 'self' https://challenges.cloudflare.com;",
                 "Strict-Transport-Security:",
                 "X-Content-Type-Options: nosniff",
                 "X-Frame-Options: DENY",

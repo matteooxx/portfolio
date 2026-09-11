@@ -29,9 +29,13 @@ fail() {
 [[ -f "$ROOT/cloudflare/_headers" ]] || fail "missing cloudflare/_headers"
 [[ ! -L "$ROOT/cloudflare/_headers" ]] || fail "cloudflare/_headers is a symlink"
 
-grep -Fqx 'window.PORTFOLIO_CONTACT_ENDPOINT = "";' \
+grep -Fqx 'window.PORTFOLIO_CONTACT_ENDPOINT = "/api/contact";' \
     "$ROOT/contact-config.js" ||
-    fail "contact-config.js must retain the static mailto fallback"
+    fail "contact-config.js must point at the same-origin /api/contact route"
+
+if grep -Fq '__TURNSTILE_SITEKEY__' "$ROOT/contact.html"; then
+    fail "contact.html still has the Turnstile sitekey placeholder"
+fi
 
 for relative in "${PUBLIC_FILES[@]}"; do
     source_path="$ROOT/$relative"

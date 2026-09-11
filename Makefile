@@ -9,6 +9,8 @@ local:
 check:
 	node --check script.js
 	node --check lambda/index.mjs
+	node --check worker/index.mjs
+	node --test tests/worker.test.mjs
 	test -f assets/king-meal-prep.png
 	test -f assets/recsbot-interface.png
 	test -f assets/lucide.min.js
