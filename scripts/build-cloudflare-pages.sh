@@ -17,6 +17,7 @@ PUBLIC_FILES=(
     assets/LUCIDE-LICENSE.txt
     assets/king-meal-prep.png
     assets/lucide.min.js
+  assets/og-card.png
     assets/recsbot-interface.png
 )
 
