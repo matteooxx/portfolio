@@ -73,6 +73,17 @@ Do not replace them with screenshots from private NAS runtimes or real user
 data. Do not add screenshots from SafeZone, Tensei, Project ARIA, customer
 systems, cloud consoles, or employer-managed tools.
 
+`assets/og-card.png` is the 1200x630 link-preview card: a text-only design
+with no screenshot or embedded metadata. Every page except `404.html` declares
+it with a `canonical` link and `og:url` set to the clean URL
+(`https://matteomastore.com/about`, not `about.html`), because Cloudflare
+redirects `.html` URLs. `404.html` is `noindex` and has no own URL.
+
+Each page must be one complete document. Editing a page in the GitHub web
+editor once pasted a new copy above the old one, so `projects.html` and
+`contact.html` rendered every section twice; `tests/test_static_site.py` now
+fails on repeated document elements, IDs, or meta tags.
+
 Lucide 0.468.0 is bundled at `assets/lucide.min.js` under the ISC license.
 
 ## Contact Modes

@@ -143,6 +143,51 @@ class StaticSiteTests(unittest.TestCase):
             width, height = struct.unpack(">II", signature[16:24])
             self.assertEqual((width, height), (1440, 900))
 
+    def test_each_page_is_a_single_document(self) -> None:
+        for page_name in PAGES:
+            html = (ROOT / page_name).read_text(encoding="utf-8")
+            for pattern in (
+                r"<!DOCTYPE html>",
+                r"<html[\s>]",
+                r"<head>",
+                r"<body[\s>]",
+                r"<main[\s>]",
+                r"<h1[\s>]",
+                r"<title>",
+            ):
+                self.assertEqual(
+                    len(re.findall(pattern, html, re.IGNORECASE)),
+                    1,
+                    f"{page_name}: expected exactly one {pattern}",
+                )
+            ids = re.findall(r'\sid="([^"]+)"', html)
+            duplicate_ids = {name for name in ids if ids.count(name) > 1}
+            self.assertFalse(duplicate_ids, f"{page_name}: {duplicate_ids}")
+            metas = re.findall(r'<meta\s+(?:name|property)="([^"]+)"', html)
+            duplicate_metas = {name for name in metas if metas.count(name) > 1}
+            self.assertFalse(duplicate_metas, f"{page_name}: {duplicate_metas}")
+
+    def test_canonical_and_open_graph_urls_do_not_redirect(self) -> None:
+        # Cloudflare redirects /page.html to /page, so canonical and og:url
+        # must use the final clean URL.
+        for page_name in PAGES:
+            html = (ROOT / page_name).read_text(encoding="utf-8")
+            urls = re.findall(
+                r'<link rel="canonical" href="([^"]+)"', html
+            ) + re.findall(r'<meta property="og:url" content="([^"]+)"', html)
+            if page_name == "404.html":
+                self.assertEqual(urls, [], "the 404 page has no own URL")
+                continue
+            slug = "" if page_name == "index.html" else page_name[:-5]
+            expected = f"https://matteomastore.com/{slug}"
+            self.assertEqual(urls, [expected, expected], page_name)
+
+    def test_open_graph_card_has_the_declared_dimensions(self) -> None:
+        with (ROOT / "assets/og-card.png").open("rb") as handle:
+            signature = handle.read(24)
+        self.assertEqual(signature[:8], b"\x89PNG\r\n\x1a\n")
+        self.assertEqual(struct.unpack(">II", signature[16:24]), (1200, 630))
+
     def test_private_phone_and_cv_are_not_published(self) -> None:
         html = "\n".join(
             (ROOT / page).read_text(encoding="utf-8") for page in PAGES
