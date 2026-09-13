@@ -97,9 +97,13 @@
       });
     }
 
-    var current = window.location.pathname.split("/").pop() || "index.html";
+    // Cloudflare serves clean URLs (/about), local previews use about.html.
+    var pageName = function (path) {
+      return path.split("/").pop().replace(/\.html$/, "") || "index";
+    };
+    var current = pageName(window.location.pathname);
     document.querySelectorAll(".site-nav a").forEach(function (link) {
-      if (link.getAttribute("href") === current) {
+      if (pageName(link.getAttribute("href")) === current) {
         link.classList.add("active");
         link.setAttribute("aria-current", "page");
       }
