@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import base64
+import hashlib
+import json
 import re
 import struct
 import unittest
@@ -17,6 +20,16 @@ PAGES = (
     "contact.html",
     "404.html",
 )
+
+
+def webp_size(path: Path) -> tuple[int, int]:
+    """Read the pixel size of a lossy (VP8) WebP file without Pillow."""
+    data = path.read_bytes()
+    if data[:4] != b"RIFF" or data[8:12] != b"WEBP" or data[12:16] != b"VP8 ":
+        raise AssertionError(f"{path.name} is not a lossy WebP file")
+    width = int.from_bytes(data[26:28], "little") & 0x3FFF
+    height = int.from_bytes(data[28:30], "little") & 0x3FFF
+    return width, height
 
 
 class ReferenceParser(HTMLParser):
@@ -134,14 +147,10 @@ class StaticSiteTests(unittest.TestCase):
 
     def test_project_images_have_stable_dimensions(self) -> None:
         for relative in (
-            "assets/king-meal-prep.png",
-            "assets/recsbot-interface.png",
+            "assets/king-meal-prep.webp",
+            "assets/recsbot-interface.webp",
         ):
-            with (ROOT / relative).open("rb") as handle:
-                signature = handle.read(24)
-            self.assertEqual(signature[:8], b"\x89PNG\r\n\x1a\n")
-            width, height = struct.unpack(">II", signature[16:24])
-            self.assertEqual((width, height), (1440, 900))
+            self.assertEqual(webp_size(ROOT / relative), (1440, 900), relative)
 
     def test_each_page_is_a_single_document(self) -> None:
         for page_name in PAGES:
@@ -187,6 +196,46 @@ class StaticSiteTests(unittest.TestCase):
             signature = handle.read(24)
         self.assertEqual(signature[:8], b"\x89PNG\r\n\x1a\n")
         self.assertEqual(struct.unpack(">II", signature[16:24]), (1200, 630))
+
+    def test_structured_data_matches_the_content_security_policy(self) -> None:
+        # script-src has no 'unsafe-inline', so the JSON-LD block is allowed by
+        # its hash: the two must stay in step.
+        headers = (ROOT / "cloudflare/_headers").read_text(encoding="utf-8")
+        allowed = set(re.findall(r"'sha256-([A-Za-z0-9+/=]+)'", headers))
+        self.assertTrue(allowed, "no script hash in the policy")
+
+        for page_name in PAGES:
+            html = (ROOT / page_name).read_text(encoding="utf-8")
+            blocks = re.findall(
+                r'<script type="application/ld\+json">(.*?)</script>',
+                html,
+                re.DOTALL,
+            )
+            if page_name == "404.html":
+                self.assertEqual(blocks, [], "the 404 page carries no metadata")
+                continue
+            self.assertEqual(len(blocks), 1, page_name)
+            digest = base64.b64encode(
+                hashlib.sha256(blocks[0].encode("utf-8")).digest()
+            ).decode()
+            self.assertIn(digest, allowed, f"{page_name}: unlisted script hash")
+            data = json.loads(blocks[0])
+            self.assertEqual(data["@context"], "https://schema.org")
+
+    def test_sitemap_and_robots_cover_the_public_pages(self) -> None:
+        sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+        listed = set(re.findall(r"<loc>(.*?)</loc>", sitemap))
+        expected = {
+            "https://matteomastore.com/"
+            + ("" if page == "index.html" else page[:-5])
+            for page in PAGES
+            if page != "404.html"
+        }
+        self.assertEqual(listed, expected)
+
+        robots = (ROOT / "robots.txt").read_text(encoding="utf-8")
+        self.assertIn("Sitemap: https://matteomastore.com/sitemap.xml", robots)
+        self.assertIn("Disallow: /api/", robots)
 
     def test_private_phone_and_cv_are_not_published(self) -> None:
         html = "\n".join(

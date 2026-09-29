@@ -20,11 +20,12 @@ PUBLIC_FILES = {
     "style.css",
     "script.js",
     "contact-config.js",
+    "robots.txt",
+    "sitemap.xml",
     "assets/LUCIDE-LICENSE.txt",
-    "assets/king-meal-prep.png",
-    "assets/lucide.min.js",
+    "assets/king-meal-prep.webp",
     "assets/og-card.png",
-    "assets/recsbot-interface.png",
+    "assets/recsbot-interface.webp",
 }
 
 

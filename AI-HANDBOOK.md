@@ -65,7 +65,7 @@ The public pages are:
 
 ## Visual Assets
 
-`assets/king-meal-prep.png` and `assets/recsbot-interface.png` were captured
+`assets/king-meal-prep.webp` and `assets/recsbot-interface.webp` were captured
 from isolated local copies of the sanitized personal projects. Both used fresh
 databases and synthetic content. They may be published with this portfolio.
 
@@ -84,7 +84,18 @@ editor once pasted a new copy above the old one, so `projects.html` and
 `contact.html` rendered every section twice; `tests/test_static_site.py` now
 fails on repeated document elements, IDs, or meta tags.
 
-Lucide 0.468.0 is bundled at `assets/lucide.min.js` under the ISC license.
+Icons are inlined as SVG in the pages, and the two menu icons live in
+`script.js`; the Lucide runtime is not shipped. Their paths come from Lucide
+0.468.0 (ISC), whose licence stays at `assets/LUCIDE-LICENSE.txt` and is
+published with the site. Take new icons from that release and keep the same
+`data-lucide` attribute, so the existing `svg` styling applies.
+
+`robots.txt` and `sitemap.xml` are published; the sitemap lists the clean URL
+of every page except `404.html`. Each indexable page carries one JSON-LD
+block, identical across pages. `script-src` has no `'unsafe-inline'`, so that
+block is allowed by the `sha256-` hash in `cloudflare/_headers`: change the
+block and the hash must change with it. `tests/test_static_site.py` enforces
+both, and no external script, font, or stylesheet may be added.
 
 ## Contact Modes
 

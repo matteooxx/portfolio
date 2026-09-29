@@ -1,6 +1,11 @@
 (function () {
   "use strict";
 
+  var ICON_MENU =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="menu" aria-hidden="true"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>';
+  var ICON_CLOSE =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="x" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>';
+
   var CONTACT_API_URL = String(window.PORTFOLIO_CONTACT_ENDPOINT || "").trim();
   var CONTACT_EMAIL = "matteo.mastore.job@gmail.com";
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -27,23 +32,12 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     setYear();
-    refreshIcons();
     initNavigation();
     initReveal();
     initProjectFilters();
     initContactForm();
   });
 
-  function refreshIcons() {
-    if (window.lucide && typeof window.lucide.createIcons === "function") {
-      window.lucide.createIcons({
-        attrs: {
-          "aria-hidden": "true",
-          "stroke-width": "2",
-        },
-      });
-    }
-  }
 
   function setYear() {
     document.querySelectorAll("[data-year]").forEach(function (element) {
@@ -60,9 +54,7 @@
       navigation.classList.toggle("open", open);
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
       toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
-      toggle.innerHTML =
-        '<i data-lucide="' + (open ? "x" : "menu") + '" aria-hidden="true"></i>';
-      refreshIcons();
+      toggle.innerHTML = open ? ICON_CLOSE : ICON_MENU;
     }
 
     if (toggle && navigation) {
