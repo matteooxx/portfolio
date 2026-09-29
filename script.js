@@ -196,7 +196,7 @@
 
       if (response.ok) {
         form.reset();
-        setStatus(status, "Message sent. Thank you.", "success");
+        setStatus(status, "Message sent. I'll reply by email.", "success");
         return;
       }
 

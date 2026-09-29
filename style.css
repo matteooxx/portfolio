@@ -606,6 +606,39 @@ textarea {
   color: var(--text-soft);
 }
 
+/* Wide screens read the intro as one editorial spread: the headline holds the
+ * left, its summary sits beside it instead of below a tall gap. */
+@media (min-width: 1000px) {
+  .page-intro-grid {
+    grid-template-columns: var(--rail) minmax(0, 1.05fr) minmax(0, 0.95fr);
+    align-items: start;
+  }
+
+  .page-intro-grid > div:first-child {
+    display: contents;
+  }
+
+  .page-intro-grid > div:first-child .eyebrow {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .page-intro h1 {
+    grid-column: 2;
+    grid-row: 1;
+    max-width: 20ch;
+    margin-bottom: 0;
+  }
+
+  .page-intro-copy {
+    grid-column: 3;
+    grid-row: 1;
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--rule);
+  }
+}
+
 /* ------------------------------------------------------- focus + features */
 
 .focus-grid {
