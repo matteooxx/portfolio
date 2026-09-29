@@ -97,6 +97,35 @@ block is allowed by the `sha256-` hash in `cloudflare/_headers`: change the
 block and the hash must change with it. `tests/test_static_site.py` enforces
 both, and no external script, font, or stylesheet may be added.
 
+## Design System
+
+`style.css` is the whole system; there is no framework and no build step for
+CSS. Every value comes from the tokens in `:root`: grounds (`--ground`,
+`--well`, `--raised`), text (`--text`, `--text-soft`, `--text-faint`), one
+accent (`--accent`, with `--accent-bright` for hover and `--accent-ink` for
+text on it), rules, the two type families, the type steps `--step-0` to
+`--step-5`, and the spacing steps. Add a token rather than a literal colour or
+font size; the stylesheet currently contains no hard-coded colour outside
+`:root`.
+
+Layout: sections run on an asymmetric grid, `var(--rail)` then the content
+column. The narrow rail carries facts - section label, dates, ownership,
+counts - and never decoration. Cards are rule-separated rows, not boxes.
+Ownership is encoded structurally: a solid accent rule for personal work, a
+dashed grey rule for group work, matching the words in the copy.
+
+Type: Instrument Serif for display and Archivo for text, both self-hosted in
+`assets/fonts/` under the OFL, preloaded, `font-display: swap`. No uppercase
+labels, no external font or icon service - the CSP forbids both.
+
+Motion: one entrance on the hero, plus state feedback on hover and focus.
+Nothing else animates, and `prefers-reduced-motion` turns the entrance off.
+
+Quality floor for any change: contrast at least 4.5:1 (the stylesheet is
+checked at 4.67 and above), a visible focus ring, a layout that holds from
+375px to 1920px, and `[hidden]` still winning over layout rules so the project
+filter works.
+
 ## Contact Modes
 
 The public site posts the contact form to `/api/contact`, handled by the

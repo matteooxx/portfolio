@@ -36,7 +36,10 @@
   --text-soft: #9daeb0;
   --text-faint: #71858a;
   --accent: #dfff57;
+  --accent-bright: #eaff8c;
   --accent-ink: #11171a;
+  --veil-ground: rgba(17, 23, 26, 0.82);
+  --veil-well: rgba(12, 17, 19, 0.85);
   --rule: rgba(237, 242, 241, 0.14);
   --rule-strong: rgba(237, 242, 241, 0.3);
   --success: #8fe3a8;
@@ -62,6 +65,16 @@
   --space-m: 1.5rem;
   --space-l: 3rem;
   --space-xl: clamp(4rem, 9vw, 7.5rem);
+}
+
+/* Very large screens: give the grid more room instead of a wider void. */
+@media (min-width: 1600px) {
+  :root {
+    --container: 1320px;
+    --rail: 13rem;
+    --step-5: 9rem;
+    --step-4: 5.2rem;
+  }
 }
 
 * {
@@ -208,7 +221,7 @@ textarea {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(17, 23, 26, 0.82);
+  background: var(--veil-ground);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--rule);
 }
@@ -267,7 +280,7 @@ textarea {
   color: var(--text);
 }
 
-.site-nav a.active::after {
+.site-nav a::after {
   content: "";
   position: absolute;
   left: 0;
@@ -275,6 +288,13 @@ textarea {
   bottom: -0.15rem;
   height: 2px;
   background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 200ms ease;
+}
+
+.site-nav a.active::after {
+  transform: scaleX(1);
 }
 
 .icon-button {
@@ -526,7 +546,7 @@ textarea {
 
 .button-primary:hover,
 .button-ink:hover {
-  background: #eaff8c;
+  background: var(--accent-bright);
 }
 
 .button-light {
@@ -721,7 +741,7 @@ textarea {
   place-items: center;
   width: 2.25rem;
   height: 2.25rem;
-  background: rgba(12, 17, 19, 0.85);
+  background: var(--veil-well);
   color: var(--text);
 }
 
@@ -1310,7 +1330,7 @@ textarea {
 
 .contact-list > li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.85rem;
   padding-block: 0.85rem;
   border-top: 1px solid var(--rule);
@@ -1323,7 +1343,8 @@ textarea {
 .contact-list > li > svg {
   width: 1.1rem;
   height: 1.1rem;
-  color: var(--text-faint);
+  margin-top: 0.15rem;
+  color: var(--text-soft);
   flex: none;
 }
 
@@ -1371,6 +1392,11 @@ textarea {
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--text-soft);
+  transition: color 160ms ease;
+}
+
+.field:focus-within label {
+  color: var(--text);
 }
 
 .field input,
