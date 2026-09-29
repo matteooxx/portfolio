@@ -868,8 +868,26 @@ textarea {
   max-width: 68ch;
 }
 
+.education-grid > div:first-child {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr);
+  column-gap: clamp(1.5rem, 4vw, 3.5rem);
+  row-gap: 0.5rem;
+  align-items: start;
+}
+
+.education-grid > div:first-child > * {
+  grid-column: 2;
+}
+
+.education-grid > div:first-child .eyebrow {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
 .education-grid > div:first-child h2 {
-  max-width: 14ch;
+  max-width: 20ch;
 }
 
 .education-place {
@@ -949,6 +967,10 @@ textarea {
 .experience-date span:first-child {
   color: var(--text);
   font-weight: 500;
+}
+
+.experience-date span + span::before {
+  content: "to ";
 }
 
 .experience-date small {
@@ -1052,6 +1074,7 @@ textarea {
 }
 
 .applied-item h3 {
+  grid-column: 2;
   margin: 0;
   font-size: 1.35rem;
 }
@@ -1337,6 +1360,11 @@ textarea {
   min-height: 9rem;
 }
 
+.field.invalid input,
+.field.invalid textarea {
+  border-color: var(--error);
+}
+
 .field-error {
   min-height: 1.1rem;
   color: var(--error);
@@ -1346,6 +1374,12 @@ textarea {
 .turnstile-field {
   display: grid;
   gap: 0.75rem;
+}
+
+/* Reserve the widget's height: it loads late and would shove the send
+ * button down. */
+#contact-turnstile {
+  min-height: 65px;
 }
 
 .form-note {
@@ -1366,11 +1400,11 @@ textarea {
   color: var(--text-soft);
 }
 
-.form-status[data-state="success"] {
+.form-status.success {
   color: var(--success);
 }
 
-.form-status[data-state="error"] {
+.form-status.error {
   color: var(--error);
 }
 
