@@ -7,6 +7,11 @@ import unittest
 from pathlib import Path
 from zipfile import ZipFile
 
+try:  # unittest discover puts tests/ on sys.path; a direct module run does not
+    from support import bash_command, posix_path
+except ModuleNotFoundError:  # pragma: no cover - convenience for direct runs
+    from tests.support import bash_command, posix_path
+
 
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_FILES = {
@@ -42,7 +47,11 @@ class CloudflareExportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp) / "site"
             subprocess.run(
-                ["bash", str(ROOT / "scripts/build-cloudflare-pages.sh"), str(output)],
+                [
+                    bash_command(),
+                    posix_path(ROOT / "scripts/build-cloudflare-pages.sh"),
+                    posix_path(output),
+                ],
                 check=True,
                 cwd=ROOT,
             )
@@ -61,7 +70,8 @@ class CloudflareExportTests(unittest.TestCase):
                 "Content-Security-Policy:",
                 "connect-src 'self'",
                 "frame-src https://challenges.cloudflare.com",
-                "script-src 'self' https://challenges.cloudflare.com;",
+                "script-src 'self' 'sha256-",
+                "https://challenges.cloudflare.com;",
                 "Strict-Transport-Security:",
                 "X-Content-Type-Options: nosniff",
                 "X-Frame-Options: DENY",
@@ -74,9 +84,9 @@ class CloudflareExportTests(unittest.TestCase):
             output = Path(temp) / "bundle"
             subprocess.run(
                 [
-                    "bash",
-                    str(ROOT / "scripts/package-cloudflare-pages.sh"),
-                    str(output),
+                    bash_command(),
+                    posix_path(ROOT / "scripts/package-cloudflare-pages.sh"),
+                    posix_path(output),
                 ],
                 check=True,
                 cwd=ROOT,

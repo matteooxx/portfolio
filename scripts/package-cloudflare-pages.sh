@@ -23,7 +23,13 @@ else
         > "$OUTPUT/SOURCE-COMMIT"
 fi
 
-python3 - "$OUTPUT" "$SITE" "$ARCHIVE" <<'PY'
+# Windows' python3 is a Microsoft Store stub, so fall back to python.
+PYTHON=${PYTHON:-python3}
+if ! "$PYTHON" -c "import sys" >/dev/null 2>&1; then
+    PYTHON=python
+fi
+
+"$PYTHON" - "$OUTPUT" "$SITE" "$ARCHIVE" <<'PY'
 from __future__ import annotations
 
 import hashlib
