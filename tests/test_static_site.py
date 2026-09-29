@@ -222,6 +222,30 @@ class StaticSiteTests(unittest.TestCase):
             data = json.loads(blocks[0])
             self.assertEqual(data["@context"], "https://schema.org")
 
+    def test_every_page_points_at_real_icon_files(self) -> None:
+        # Search engines ignore a data: URI icon, which is why the site showed
+        # the generic placeholder in results; the files must exist and be
+        # referenced by URL.
+        for relative in ("favicon.ico", "icon.svg", "apple-touch-icon.png"):
+            self.assertTrue((ROOT / relative).is_file(), relative)
+
+        for page_name in PAGES:
+            html = (ROOT / page_name).read_text(encoding="utf-8")
+            self.assertNotIn('rel="icon" href="data:', html, page_name)
+            for declaration in (
+                '<link rel="icon" href="/favicon.ico"',
+                '<link rel="icon" href="/icon.svg"',
+                '<link rel="apple-touch-icon" href="/apple-touch-icon.png">',
+            ):
+                self.assertIn(declaration, html, f"{page_name}: {declaration}")
+
+        with (ROOT / "favicon.ico").open("rb") as handle:
+            header = handle.read(6)
+        self.assertEqual(header[:4], bytes((0, 0, 1, 0)), "not an ICO file")
+        self.assertGreaterEqual(
+            int.from_bytes(header[4:6], "little"), 3, "needs 16, 32 and 48px"
+        )
+
     def test_sitemap_and_robots_cover_the_public_pages(self) -> None:
         sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
         listed = set(re.findall(r"<loc>(.*?)</loc>", sitemap))
