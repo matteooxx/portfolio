@@ -182,7 +182,7 @@
     }
 
     submit.disabled = true;
-    setStatus(status, "Sending message...", "");
+    setStatus(status, "Sending message…", "");
 
     try {
       var response = await fetch(CONTACT_API_URL, {

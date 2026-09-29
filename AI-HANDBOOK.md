@@ -99,32 +99,38 @@ both, and no external script, font, or stylesheet may be added.
 
 ## Design System
 
-`style.css` is the whole system; there is no framework and no build step for
-CSS. Every value comes from the tokens in `:root`: grounds (`--ground`,
-`--well`, `--raised`), text (`--text`, `--text-soft`, `--text-faint`), one
-accent (`--accent`, with `--accent-bright` for hover and `--accent-ink` for
-text on it), rules, the two type families, the type steps `--step-0` to
-`--step-5`, and the spacing steps. Add a token rather than a literal colour or
-font size; the stylesheet currently contains no hard-coded colour outside
-`:root`.
+The site is a specification sheet, not a landing page. `style.css` is the whole
+system: no framework, no CSS build step, every value a token in `:root`.
 
-Layout: sections run on an asymmetric grid, `var(--rail)` then the content
-column. The narrow rail carries facts - section label, dates, ownership,
-counts - and never decoration. Cards are rule-separated rows, not boxes.
-Ownership is encoded structurally: a solid accent rule for personal work, a
-dashed grey rule for group work, matching the words in the copy.
+Ground and ink: white paper (`--paper`), a light tint for wells and banded
+rows (`--paper-2`), a blue-black ink in three weights (`--ink`, `--ink-2`,
+`--ink-3`), two rule greys, and one deep blue accent (`--accent`) used only for
+links, the current page and focus. No dark ground, no fluorescent accent, no
+shadows, blurs or gradients - those read as a generated template.
 
-Type: Instrument Serif for display and Archivo for text, both self-hosted in
-`assets/fonts/` under the OFL, preloaded, `font-display: swap`. No uppercase
-labels, no external font or icon service - the CSP forbids both.
+Type: IBM Plex Sans for text and headings (400 and 600 only), IBM Plex Mono for
+data - dates, counts, record labels, field names - always with
+`font-variant-numeric: tabular-nums` so columns align. Both are self-hosted in
+`assets/fonts/` under the OFL and subset to the characters the site uses, which
+is why they are about 65 KB in total; regenerate with `fontTools.subset` if a
+character is missing. Headings stay at document sizes: the largest is under
+3rem. Never set a page in one giant display face.
 
-Motion: one entrance on the hero, plus state feedback on hover and focus.
-Nothing else animates, and `prefers-reduced-motion` turns the entrance off.
+Layout: a label column (`--label`) holds the section label, dates or record
+type; the wide column holds the content. Rows are separated by rules, not
+boxed into cards. The home page opens with a title block - identity on the
+left, a ruled field list (location, status, degree, most recent role) on the
+right - the same shape as `assets/og-card.png`. Ownership is structural: a
+solid ink rule on personal work, a dashed grey rule on group work.
 
-Quality floor for any change: contrast at least 4.5:1 (the stylesheet is
-checked at 4.67 and above), a visible focus ring, a layout that holds from
-375px to 1920px, and `[hidden]` still winning over layout rules so the project
-filter works.
+Motion: none beyond state feedback on hover and focus, all of it listed
+property by property, never `transition: all`. `prefers-reduced-motion` is
+honoured. A print stylesheet drops the chrome so the pages print as sheets.
+
+Quality floor for any change: contrast at least 4.5:1 (currently 4.52 and
+above), a visible focus ring, a layout that holds from 375px to 1920px,
+`[hidden]` still beating the layout rules so the project filter works, and
+Lighthouse at 100 for accessibility, best practices and SEO.
 
 ## Contact Modes
 

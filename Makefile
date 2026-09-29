@@ -14,8 +14,8 @@ check:
 	test -f assets/king-meal-prep.webp
 	test -f assets/recsbot-interface.webp
 	test -f assets/og-card.png
-	test -f assets/fonts/instrument-serif.woff2
-	test -f assets/fonts/archivo.woff2
+	test -f assets/fonts/plex-sans-400.woff2
+	test -f assets/fonts/plex-mono-400.woff2
 	python3 -m unittest discover -s tests
 
 invalidate:
