@@ -346,7 +346,9 @@ textarea {
 .page-intro-grid {
   display: grid;
   grid-template-columns: var(--rail) minmax(0, 1fr);
-  gap: clamp(1.5rem, 4vw, 3.5rem);
+  /* The wide gap is horizontal: rows stay close to what they belong to. */
+  column-gap: clamp(1.5rem, 4vw, 3.5rem);
+  row-gap: 0.75rem;
   align-items: start;
 }
 
@@ -363,8 +365,13 @@ textarea {
   grid-column: 2;
 }
 
+/* One space between a heading and its copy: the grid's row gap. */
+.section-heading h2 {
+  margin-bottom: 0;
+}
+
 .section-heading h2 + p {
-  margin-top: 0.8rem;
+  margin-top: 0;
   color: var(--text-soft);
 }
 
@@ -420,7 +427,7 @@ textarea {
 
 .hero {
   position: relative;
-  padding-block: clamp(4rem, 12vh, 8rem) clamp(3rem, 7vh, 5rem);
+  padding-block: clamp(2.5rem, 9vh, 8rem) clamp(2.5rem, 6vh, 5rem);
   overflow: hidden;
 }
 
@@ -1532,8 +1539,11 @@ textarea {
     animation: rise 620ms cubic-bezier(0.2, 0.7, 0.3, 1) backwards;
   }
 
+  /* The h1 is the LCP element: fading it in would delay the largest paint by
+   * the whole animation, so it only moves. */
   .hero h1 {
-    animation-delay: 60ms;
+    animation-name: rise-opaque;
+    animation-delay: 0ms;
   }
 
   .hero-role {
@@ -1552,6 +1562,12 @@ textarea {
 @keyframes rise {
   from {
     opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+@keyframes rise-opaque {
+  from {
     transform: translateY(0.75rem);
   }
 }
