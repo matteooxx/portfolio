@@ -11,9 +11,11 @@ check:
 	node --check lambda/index.mjs
 	node --check worker/index.mjs
 	node --test tests/worker.test.mjs
-	test -f assets/king-meal-prep.png
-	test -f assets/recsbot-interface.png
-	test -f assets/lucide.min.js
+	test -f assets/king-meal-prep.webp
+	test -f assets/recsbot-interface.webp
+	test -f assets/og-card.png
+	test -f assets/fonts/instrument-serif.woff2
+	test -f assets/fonts/archivo.woff2
 	python3 -m unittest discover -s tests
 
 invalidate:
