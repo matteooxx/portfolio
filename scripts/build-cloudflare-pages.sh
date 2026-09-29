@@ -17,6 +17,11 @@ PUBLIC_FILES=(
     robots.txt
     sitemap.xml
     assets/LUCIDE-LICENSE.txt
+    assets/fonts/OFL-Archivo.txt
+    assets/fonts/OFL-Instrument-Serif.txt
+    assets/fonts/archivo.woff2
+    assets/fonts/instrument-serif-italic.woff2
+    assets/fonts/instrument-serif.woff2
     assets/king-meal-prep.webp
     assets/og-card.png
     assets/recsbot-interface.webp
@@ -47,7 +52,7 @@ done
 
 mkdir -p "$OUTPUT/assets"
 for relative in "${PUBLIC_FILES[@]}"; do
-    install -m 0644 "$ROOT/$relative" "$OUTPUT/$relative"
+    install -D -m 0644 "$ROOT/$relative" "$OUTPUT/$relative"
 done
 install -m 0644 "$ROOT/cloudflare/_headers" "$OUTPUT/_headers"
 

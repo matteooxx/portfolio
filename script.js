@@ -33,7 +33,6 @@
   document.addEventListener("DOMContentLoaded", function () {
     setYear();
     initNavigation();
-    initReveal();
     initProjectFilters();
     initContactForm();
   });
@@ -102,36 +101,6 @@
     });
   }
 
-  function initReveal() {
-    var elements = document.querySelectorAll(".reveal");
-    if (!elements.length) return;
-
-    if (
-      !("IntersectionObserver" in window) ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      elements.forEach(function (element) {
-        element.classList.add("visible");
-      });
-      return;
-    }
-
-    var observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.08, rootMargin: "0px 0px -32px 0px" }
-    );
-
-    elements.forEach(function (element) {
-      observer.observe(element);
-    });
-  }
 
   function initProjectFilters() {
     var buttons = document.querySelectorAll("[data-project-filter]");
