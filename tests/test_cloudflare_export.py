@@ -31,6 +31,8 @@ PUBLIC_FILES = {
     "robots.txt",
     "sitemap.xml",
     "work/king-of-meal-prep.html",
+    "work/recsbot.html",
+    "work/taste-platform.html",
     "assets/LUCIDE-LICENSE.txt",
     "assets/fonts/OFL-IBM-Plex.txt",
     "assets/fonts/plex-mono-400.woff2",

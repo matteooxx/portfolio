@@ -19,6 +19,8 @@ PAGES = (
     "projects.html",
     "contact.html",
     "work/king-of-meal-prep.html",
+    "work/recsbot.html",
+    "work/taste-platform.html",
     "404.html",
 )
 
