@@ -56,10 +56,10 @@
           <h1>Home server platform</h1>
         </div>
         <p class="page-intro-copy">
-          One machine, a mirrored pool and a dozen containers that someone
-          actually depends on. The interesting part is not what it runs; it is
-          what it was made to survive, and how each cause was established rather
-          than guessed.
+          One machine, a mirrored pool and twelve services that someone actually
+          depends on. The interesting part is not what it runs; it is two
+          six-day outages, the automatic repair that was tuned to a guess, and
+          the component everybody trusted turning out to be the cause.
         </p>
       </div>
     </section>
@@ -74,19 +74,86 @@
           <p class="eyebrow">Shape</p>
           <div class="profile-copy">
             <p>
-              A single chassis runs a ZFS mirror with scheduled snapshots and
-              scrubs, SMART monitoring, dataset-level permissions, and
-              containerised services behind private networking. There is no
-              second machine to fail over to and no second site.
+              A single chassis runs a two-disk ZFS mirror carrying twelve
+              containerised services behind private networking, with
+              dataset-level permissions, SMART monitoring, a monthly pool scrub
+              and twelve daily snapshot tasks retained for two to four weeks.
             </p>
             <p>
-              The operator is usually not on the home network, so almost every
-              repair happens over a remote session with no screen, no console
-              and nobody on site to press a button. That constraint decides most
-              of what follows: anything that can only be fixed by standing in
-              front of the box is a design fault, not an inconvenience.
+              There is no second machine to fail over to. The operator is
+              usually not on the home network, so almost every repair happens
+              over a remote session with no screen, no console and nobody on
+              site to press a button. That constraint decides everything below:
+              anything that can only be fixed by standing in front of the box is
+              a design fault, not an inconvenience.
             </p>
-            <p class="stack-line">TrueNAS SCALE, ZFS, Docker, Linux, SMART, mesh VPN</p>
+            <p class="stack-line">TrueNAS SCALE, ZFS, Docker, Linux, systemd, SMART, mesh VPN</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-muted">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Failure</p>
+          <h2>Two six-day outages with no error at the time</h2>
+        </div>
+        <p>
+          Twice in a summer every service died at once, six days each, with the
+          same signature: containers refusing to start on a missing filesystem
+          layer, and an image store that reported almost nothing while still
+          occupying tens of gigabytes on disk.
+        </p>
+        <ul class="bullet-list">
+          <li><strong>The failure was latent, which is why it was hard.</strong> An unclean restart during an image-metadata write leaves the layer database inconsistent. Nothing breaks: the containers already running keep serving from filesystems they had opened before, so the machine looks healthy for days.</li>
+          <li><strong>An unrelated job detonated it.</strong> The weekly update pull was the first thing to read the damaged records. The daemon then garbage-collected them as invalid, the images disappeared, and everything that tried to start afterwards failed.</li>
+          <li><strong>So the timestamp lied.</strong> The outage began days after its cause, during a routine task that had nothing to do with it. Looking for a culprit near the symptom would have found the update job, which was innocent.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Automation</p>
+          <h2>A repair that failed on a number nobody had measured</h2>
+        </div>
+        <div class="profile-grid">
+          <p class="eyebrow">Guard</p>
+          <div class="profile-copy">
+            <p>
+              The first answer was to stop repairing it by hand: an integrity
+              check every fifteen minutes, so corruption is caught while the
+              machine is running rather than at the next boot, and a bounded
+              recovery that restarts the daemon, puts back the image tags it
+              finds missing and redeploys what is still down.
+            </p>
+            <p>
+              <strong>It did not work, for an embarrassing reason.</strong> The
+              recovery gave the daemon a hundred and eighty seconds to come back
+              and gave up if it did not. On this machine, with that image store,
+              the daemon takes between two hundred and twelve and two hundred
+              and twenty-seven seconds. The limit had been chosen, not measured,
+              and it was wrong by enough that every single automatic repair
+              aborted and became a manual one. Raised to six hundred seconds
+              against the observed numbers, the recovery then ran unattended and
+              restored the machine on its own.
+            </p>
+            <p>
+              Two more faults came out of watching it work: a startup race where
+              the health check read a not-yet-readable configuration directory as
+              "no applications installed", and a tag restore that aborted partway
+              through when it met an image pinned by digest rather than by name.
+            </p>
+            <p>
+              <strong>The automation records what it cannot vouch for.</strong>
+              Its snapshot of a healthy system can go stale when it meets
+              references it refuses to capture, so the runbook says to read the
+              capture timestamp before trusting the recovery's idea of which
+              services should be running. An automatic repair that quietly works
+              from a stale picture is worse than one that does nothing.
+            </p>
           </div>
         </div>
       </div>
@@ -96,23 +163,23 @@
       <div class="container">
         <div class="section-heading">
           <p class="eyebrow">Diagnosis</p>
-          <h2>A reboot that kept happening, and the counter that explained it</h2>
+          <h2>The cause was upstream of everything being fixed</h2>
         </div>
         <p>
-          The machine was restarting uncleanly: about once a month for most of a
-          year, then seven times in eighteen days. Nothing in the logs survived
-          the event. The system log simply stopped mid-line, with no shutdown
-          sequence after it.
+          All of that handled the symptom. The unclean restarts themselves kept
+          happening: roughly one a month for most of a year, then seven in
+          eighteen days. Nothing in the logs survived them, because the system
+          log simply stopped mid-line with no shutdown sequence after it.
         </p>
         <ul class="bullet-list">
-          <li><strong>The evidence that did survive</strong> was a SMART attribute on the boot disk that increments only when power is removed without a flush, kept in the monitoring daemon's own attribute history going back more than a year. Every unexplained restart had a matching increment, to the second, and the spinning disk logged an emergency head retract at the same moment.</li>
-          <li><strong>What it was not.</strong> No kernel panic record. The hardware watchdog was inactive, with a clean boot status and nothing holding its device. No machine-check, thermal, storage or out-of-memory message on any of the days.</li>
-          <li><strong>Not the house, either.</strong> A second, independent machine on the same mains stayed up continuously across two of the events, which rules out a building-wide outage and narrows the fault to something between the wall and this one chassis.</li>
-          <li><strong>What was left</strong> was the component in that path nobody had questioned: the UPS. A battery that can no longer hold the load drops its output for milliseconds on a mains sag, resetting only what sits behind it, which is exactly the shape of the evidence. It was replaced, and the spontaneous events stopped.</li>
+          <li><strong>The evidence that did survive</strong> was a SMART attribute on the boot disk that increments only when power is removed without a flush, kept in the monitoring daemon's own attribute history going back more than a year. Every unexplained restart had a matching increment to the second, and the spinning disk logged an emergency head retract at the same moment.</li>
+          <li><strong>What it was not.</strong> No kernel panic record. The hardware watchdog inactive, with a clean boot status and nothing holding its device. No machine-check, thermal, storage or out-of-memory message on any of the days.</li>
+          <li><strong>Not the building, either.</strong> A second, independent machine on the same mains stayed up continuously across two of the events, which rules out a supply failure and narrows the fault to something between the wall and this one chassis.</li>
+          <li><strong>What was left</strong> was the component in that path nobody had questioned: the UPS. A battery at the end of its life drops the output for milliseconds on a mains sag instead of riding through it, resetting only what sits behind it, which is exactly the shape of the evidence. It was replaced, and the spontaneous events stopped.</li>
         </ul>
         <p>
-          The lesson is not about power. It is that the component assumed to be
-          protecting the system was the one breaking it, and the only reason that
+          The lesson is not about power. It is that the device installed to
+          protect the machine was the one breaking it, and the only reason that
           was provable is that something had been recording a cheap, boring
           counter for a year before anyone needed it.
         </p>
@@ -122,41 +189,46 @@
     <section class="section">
       <div class="container">
         <div class="section-heading">
-          <p class="eyebrow">Recovery</p>
+          <p class="eyebrow">Verification</p>
           <h2>Letting the battery decide, and proving the alert path</h2>
         </div>
         <div class="profile-grid">
           <p class="eyebrow">Configuration</p>
           <div class="profile-copy">
             <p>
-              The replacement UPS reports over USB to a monitoring daemon, with
-              the driver taken from the scan tool rather than guessed. The stock
+              The replacement reports over USB to a monitoring daemon, with the
+              driver taken from the scan tool rather than guessed. The stock
               policy shuts the machine down a fixed thirty seconds after the
               power goes, which would power off a healthy server over a
               half-minute dip. It was changed so the UPS itself signals when the
               battery is nearly empty, and so it cuts its own output once
               shutdown completes: otherwise returning mains finds a machine that
-              never cold-starts.
-            </p>
-            <p>
-              The monitoring password is generated on the machine and written
-              nowhere. Not to a file, not to a command line, not to the
-              operations handbook.
+              never cold-starts. The monitoring password is generated on the
+              machine and written nowhere - not to a file, not to a command
+              line, not to the operations handbook.
             </p>
             <p>
               <strong>Tested rather than assumed.</strong> The input was
               unplugged for a hundred and five seconds with the server live. It
               transferred to battery, stayed up, and the alert email was accepted
-              one second after detection. Mains returned, and the battery was
-              back to its float level within the hour, which also settled whether
-              the charge reading was stuck or simply flat at the top.
+              one second after detection. Mains returned, and the charge was back
+              at the top within the hour.
+            </p>
+            <p>
+              <strong>Still holding.</strong> The power-loss counter has not
+              moved since the swap, and the machine has been up continuously
+              since the moment it was unplugged to install the new unit. A new
+              increment from here would mean the replacement failed too, which is
+              a different and more serious claim than the one it replaced.
             </p>
             <p>
               <strong>What is still unproven, and says so.</strong> No event has
               driven the battery low enough to trigger the shutdown itself, so
               the handbook records the detection and alerting path as verified
-              and the graceful shutdown as not. Writing it the other way round
-              would cost nothing today and everything on the night it matters.
+              and the graceful shutdown as not. The same discipline applies to
+              waking the machine remotely: sending the packet is proven, waking a
+              powered-off machine with it is not, and the two are written
+              separately.
             </p>
           </div>
         </div>
@@ -178,14 +250,16 @@
           moment it fired.
         </p>
         <ul class="bullet-list">
-          <li>Re-resolved by serial, the alerts belonged to the older mirror member, which had since completed an extended self-test cleanly, hundreds of power-on hours after the failure that raised the alert.</li>
+          <li>Re-resolved by serial, the alerts belonged to the older mirror member, which had since completed an extended self-test cleanly, hundreds of power-on hours after the failure that raised them.</li>
           <li>Its live counters for pending, reallocated and uncorrectable sectors were all zero, and a full pool scrub three days earlier had repaired nothing and reported no errors.</li>
           <li>They were dismissed on that evidence instead of re-running hours of disk I/O to re-derive what the record already said. Dismissed, not hidden: if the condition returns, the daemon raises a fresh alert.</li>
         </ul>
         <p>
-          The older drive is still treated as the suspect one. It had a real read
-          failure, it is the senior member of the mirror, and it spent months
-          absorbing the abrupt power loss described above.
+          The same trap is wired into the automation, and is still open: a build
+          script guards itself by reading the temperature of a hard-coded device
+          path, which on the current boot is not the disk it was written to
+          protect. It is written down as a known defect rather than quietly left
+          to be rediscovered.
         </p>
       </div>
     </section>
@@ -194,18 +268,19 @@
       <div class="container">
         <div class="section-heading">
           <p class="eyebrow">Availability</p>
-          <h2>The remote access path was a single point of failure</h2>
+          <h2>The way in ran on the machine it let you into</h2>
         </div>
         <p>
-          Remote access ran as a container on the same machine it provided access
-          to. When that container failed, the way in failed with it, and the only
-          thing that could have repaired it was on the other side of the door.
-          One such failure locked the machine out for six days.
+          Remote access ran as a container on the server itself. When it failed,
+          the way in failed with it, and the only thing that could have repaired
+          it was on the other side of the door. That is what turned two ordinary
+          faults into six-day outages: not the fault, the inability to reach it.
         </p>
         <ul class="bullet-list">
-          <li><strong>The stopgap was worse than it looked.</strong> The route back in briefly depended on a computer that did not belong to the operator, on the same local network. Using it meant asking another person to have their machine switched on at the exact moment something broke. It worked once, under pressure; it was never something to rely on.</li>
-          <li><strong>The fix was separation.</strong> A small always-on machine now sits on the same network sharing no power supply, operating system, disk or service with the server. When the server's remote access dies, that machine is still reachable and can still reach the server locally. It also hosts monitoring, so it earns its place instead of waiting for a failure.</li>
-          <li><strong>Keys stay where they belong.</strong> The credential for the server is never copied onto the second machine; the connection is tunnelled through it instead, so compromising one node does not hand over the other.</li>
+          <li><strong>The stopgap was worse than it looked.</strong> The route back in briefly depended on a computer that did not belong to the operator, on the same local network. Using it meant asking another person to have their machine switched on at the exact moment something broke, while the operator is almost never at home when it does. It worked once, under pressure; it was never something to rely on.</li>
+          <li><strong>The fix was separation.</strong> A small always-on machine now sits on the same network sharing no power supply, operating system, disk or service with the server. When the server's remote access dies, that machine is still reachable from outside and can still reach the server locally. It also carries DNS filtering and uptime monitoring, so it earns its keep instead of waiting for a failure - and monitoring that runs on a different machine from the one it watches is the only kind that survives the outage it is meant to report.</li>
+          <li><strong>Keys stay where they belong.</strong> The server's private key is never copied onto that machine; the connection is tunnelled through it so it forwards traffic and never sees the key. Otherwise the rescue path would become a second machine from which the server could be fully compromised, which defeats the point of keeping the two independent.</li>
+          <li><strong>The fallbacks are tested, and the failed one is written down.</strong> The bastion holds a wired address and a wireless one so a dead switch port is survivable; its own remote access is pinned to a flag that stops it rewriting the resolver it hosts. The wake-on-LAN path, by contrast, is documented as a trap: the address the network returns for the server belongs to a software bridge that does not exist while the machine is off, so a packet sent there can never wake it - and because the test is normally run on a machine that is already on, it appears to succeed.</li>
         </ul>
       </div>
     </section>
@@ -220,16 +295,27 @@
           <p class="eyebrow">Scope</p>
           <div class="profile-copy">
             <p>
-              This is one box in one room. The memory is not ECC, the services
-              share a single chassis, and a mirror plus snapshots protects
-              against a disk and a mistake, not against the room. Off-site
-              replication has been interrupted for months, which is recorded as
-              an open gap rather than described as a backup strategy.
+              This is one box in one room. The memory is not ECC, the boot disk
+              is a single drive rather than a mirror, and the services share a
+              chassis. A mirror and snapshots protect against a dead disk and a
+              bad afternoon. They are not a backup, and they protect nothing
+              against the room.
             </p>
             <p>
-              Hostnames, addresses, service endpoints, disk serials and the
-              operations handbook itself stay private. What is published here is
-              the reasoning, because the reasoning is the part that transfers.
+              <strong>There is no off-site copy, on purpose.</strong> The
+              appliance's built-in cloud sync authenticates only with long-lived
+              static keys, and the account it would write to forbids that class
+              of credential outright - creating one would risk the account rather
+              than protect the data. Rather than quietly make the exception, the
+              pipeline was left severed, the machine kept to local snapshots
+              only, and three ways to re-attach it properly were written up and
+              left open. It is a stated gap with a reason, not an oversight, and
+              it is the largest thing wrong with this setup.
+            </p>
+            <p>
+              Hostnames, addresses, service endpoints, ports, disk serials and
+              the operations handbook itself stay private. What is published here
+              is the reasoning, because the reasoning is the part that transfers.
             </p>
           </div>
         </div>
