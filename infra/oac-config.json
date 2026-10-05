@@ -1,7 +1,0 @@
-{
-  "Name": "portfolio-site-oac",
-  "Description": "Origin access control for the portfolio site",
-  "SigningProtocol": "sigv4",
-  "SigningBehavior": "always",
-  "OriginAccessControlOriginType": "s3"
-}

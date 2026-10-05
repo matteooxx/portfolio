@@ -5,9 +5,9 @@ Read this file before changing or publishing the project.
 ## Status
 
 This personal project is a public-ready static portfolio with an optional
-provider-free local contact service and an optional historical cloud reference
-path. Content was refreshed from the NAS career briefings, the canonical
-targeted-CV facts, and the LinkedIn audit through 11 September 2026.
+provider-free local contact service. Content was refreshed from the NAS
+career briefings, the canonical targeted-CV facts, and the LinkedIn audit
+through 11 September 2026.
 
 The public pages are:
 

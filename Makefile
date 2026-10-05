@@ -1,14 +1,10 @@
-.PHONY: local check deploy invalidate smoke cloudflare-build cloudflare-bundle clean
-
-deploy:
-	bash scripts/deploy.sh
+.PHONY: local check cloudflare-build cloudflare-bundle clean
 
 local:
 	python3 local_server.py
 
 check:
 	node --check script.js
-	node --check lambda/index.mjs
 	node --check worker/index.mjs
 	node --test tests/worker.test.mjs
 	test -f assets/king-meal-prep.webp
@@ -17,17 +13,6 @@ check:
 	test -f assets/fonts/plex-sans-400.woff2
 	test -f assets/fonts/plex-mono-400.woff2
 	python3 -m unittest discover -s tests
-
-invalidate:
-	@. ./.deploy-state.env && \
-	INV=$$(aws cloudfront create-invalidation --distribution-id $$DIST_ID \
-	  --paths "/*" --query 'Invalidation.Id' --output text) && \
-	echo "Invalidation: $$INV" && \
-	aws cloudfront wait invalidation-completed --distribution-id $$DIST_ID --id $$INV && \
-	echo "completed"
-
-smoke:
-	bash scripts/smoke.sh
 
 cloudflare-build:
 	rm -rf dist/cloudflare-pages

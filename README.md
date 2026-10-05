@@ -44,11 +44,10 @@ after 90 days by default.
 - `projects.html`: filterable evidence-calibrated project inventory
 - `contact.html`: contact details and form
 - `404.html`: Cloudflare-compatible not-found response
-- `assets/`: synthetic project previews and bundled Lucide runtime
+- `assets/`: synthetic project previews, subset fonts, and the link-preview card
 - `worker/index.mjs`: Cloudflare Worker for `POST /api/contact`
 - `wrangler.jsonc`: Worker, static assets, and email binding configuration
 - `local_server.py`: optional standard-library contact service
-- `lambda/`, `infra/`, `scripts/deploy.sh`: optional cloud reference path
 
 ## Checks
 
@@ -89,9 +88,6 @@ the Cloudflare dashboard. Validate every page, asset, security header, and the
 contact fallback on the `*.workers.dev` hostname before routing a custom domain
 to it. `make cloudflare-bundle` still produces a ZIP of the static files for a
 manual upload; that bundle has no Worker, so its contact form cannot send.
-
-The optional historical AWS reference path remains in `infra/`, `lambda/`, and
-`scripts/deploy.sh`; it is not used by the Cloudflare deployment.
 
 ## License
 
