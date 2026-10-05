@@ -22,6 +22,7 @@ PAGES = (
     "work/king-of-meal-prep.html",
     "work/recsbot.html",
     "work/taste-platform.html",
+    "work/home-server.html",
     "404.html",
 )
 

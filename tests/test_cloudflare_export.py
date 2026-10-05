@@ -32,6 +32,7 @@ PUBLIC_FILES = {
     "work/king-of-meal-prep.html",
     "work/recsbot.html",
     "work/taste-platform.html",
+    "work/home-server.html",
     "assets/LUCIDE-LICENSE.txt",
     "assets/fonts/OFL-IBM-Plex.txt",
     "assets/fonts/plex-mono-400.woff2",
