@@ -1,4 +1,4 @@
-.PHONY: local check cloudflare-build cloudflare-bundle clean
+.PHONY: local check cloudflare-build clean
 
 local:
 	python3 local_server.py
@@ -17,10 +17,6 @@ check:
 cloudflare-build:
 	rm -rf dist/cloudflare-pages
 	bash scripts/build-cloudflare-pages.sh
-
-cloudflare-bundle:
-	rm -rf dist/cloudflare-pages-ready
-	bash scripts/package-cloudflare-pages.sh
 
 clean:
 	rm -rf runtime dist

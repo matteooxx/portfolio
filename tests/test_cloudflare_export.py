@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import hashlib
 import subprocess
 import tempfile
 import unittest
 from pathlib import Path
-from zipfile import ZipFile
 
 try:  # unittest discover puts tests/ on sys.path; a direct module run does not
     from support import bash_command, posix_path
@@ -89,30 +87,6 @@ class CloudflareExportTests(unittest.TestCase):
                 "Permissions-Policy:",
             ):
                 self.assertIn(required, headers)
-
-    def test_dashboard_bundle_and_manifest(self) -> None:
-        with tempfile.TemporaryDirectory() as temp:
-            output = Path(temp) / "bundle"
-            subprocess.run(
-                [
-                    bash_command(),
-                    posix_path(ROOT / "scripts/package-cloudflare-pages.sh"),
-                    posix_path(output),
-                ],
-                check=True,
-                cwd=ROOT,
-            )
-
-            archive = output / "matteo-mastore-portfolio-pages.zip"
-            with ZipFile(archive) as bundle:
-                self.assertEqual(set(bundle.namelist()), PUBLIC_FILES)
-
-            manifest = output / "SHA256SUMS"
-            for line in manifest.read_text(encoding="ascii").splitlines():
-                digest, relative = line.split("  ", 1)
-                target = output / relative
-                self.assertTrue(target.is_file(), relative)
-                self.assertEqual(hashlib.sha256(target.read_bytes()).hexdigest(), digest)
 
 
 if __name__ == "__main__":

@@ -86,8 +86,7 @@ make cloudflare-build
 account login, the GitHub connection, and custom domains are operator steps in
 the Cloudflare dashboard. Validate every page, asset, security header, and the
 contact fallback on the `*.workers.dev` hostname before routing a custom domain
-to it. `make cloudflare-bundle` still produces a ZIP of the static files for a
-manual upload; that bundle has no Worker, so its contact form cannot send.
+to it.
 
 ## License
 
