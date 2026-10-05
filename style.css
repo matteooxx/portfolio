@@ -1417,6 +1417,24 @@ textarea {
   opacity: 1;
 }
 
+/* CV: one project is a labelled row, like every other record on the site. */
+.cv-project {
+  display: grid;
+  grid-template-columns: var(--label) minmax(0, 1fr);
+  column-gap: clamp(1rem, 3vw, 2.5rem);
+  padding-block: 1.1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.cv-project h3 {
+  margin: 0 0 0.3rem;
+  font-size: var(--head-s);
+}
+
+.cv-project .bullet-list {
+  margin-top: 0.2rem;
+}
+
 /* ---------------------------------------------------------------- mobile */
 
 @media (max-width: 900px) {
@@ -1546,7 +1564,8 @@ textarea {
     min-width: 4.5rem;
   }
 
-  .form-grid {
+  .form-grid,
+  .cv-project {
     grid-template-columns: minmax(0, 1fr);
   }
 }

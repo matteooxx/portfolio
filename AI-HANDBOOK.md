@@ -38,8 +38,10 @@ The public pages are:
 - Training and exam preparation are not earned certifications. Do not mention
   AWS certification preparation.
 - The degree is the three-year NFQ Level 7 BSc in Computing Systems and
-  Operations (Software Development and DevOps): coursework and exams finished
-  in May 2026 and it is conferred in October 2026. Never call it an Honours
+  Operations (Software Development and DevOps), completed in May 2026 and
+  already awarded: write it as a degree held, never as pending, expected or
+  conferring. October 2026 is only the date of the in-person ceremony and
+  belongs on the site nowhere. Never call it an Honours
   degree. The AWS internship was its Stage 3 work placement. Availability to
   start immediately may be stated.
 - The AWS internship ended in August 2026 and may be described as completed.

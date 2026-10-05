@@ -26,6 +26,7 @@ PUBLIC_FILES = {
     "script.js",
     "apple-touch-icon.png",
     "contact-config.js",
+    "cv.html",
     "favicon.ico",
     "icon.svg",
     "robots.txt",

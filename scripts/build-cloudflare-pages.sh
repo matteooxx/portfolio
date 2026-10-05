@@ -10,6 +10,7 @@ PUBLIC_FILES=(
     experience.html
     projects.html
     contact.html
+    cv.html
     404.html
     style.css
     script.js

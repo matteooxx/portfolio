@@ -18,6 +18,7 @@ PAGES = (
     "experience.html",
     "projects.html",
     "contact.html",
+    "cv.html",
     "work/king-of-meal-prep.html",
     "work/recsbot.html",
     "work/taste-platform.html",
@@ -104,6 +105,9 @@ class StaticSiteTests(unittest.TestCase):
             "Led infrastructure and observability",
             "Final-year",
             "expected October 2026",
+            "conferred",
+            "conferring",
+            "coursework complete",
             "(Hons)",
             "Honours",
         )
