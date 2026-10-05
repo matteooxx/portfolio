@@ -18,6 +18,7 @@ PAGES = (
     "experience.html",
     "projects.html",
     "contact.html",
+    "work/king-of-meal-prep.html",
     "404.html",
 )
 

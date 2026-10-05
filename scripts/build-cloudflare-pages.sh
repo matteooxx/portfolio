@@ -19,6 +19,7 @@ PUBLIC_FILES=(
     icon.svg
     robots.txt
     sitemap.xml
+    work/king-of-meal-prep.html
     assets/LUCIDE-LICENSE.txt
     assets/fonts/OFL-IBM-Plex.txt
     assets/fonts/plex-mono-400.woff2

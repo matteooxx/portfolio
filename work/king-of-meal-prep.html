@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="How King of Meal Prep keeps a household food inventory correct: idempotent cooking transitions, compensating undo, canonical pantry units, and a hardened read-only container.">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Matteo Mastore">
+  <meta property="og:url" content="https://matteomastore.com/work/king-of-meal-prep">
+  <meta property="og:title" content="King of Meal Prep case study - Matteo Mastore">
+  <meta property="og:description" content="How King of Meal Prep keeps a household food inventory correct: idempotent cooking transitions, compensating undo, canonical pantry units, and a hardened read-only container.">
+  <meta property="og:image" content="https://matteomastore.com/assets/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Matteo Mastore - cloud and solutions engineering portfolio">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>King of Meal Prep case study - Matteo Mastore</title>
+  <link rel="canonical" href="https://matteomastore.com/work/king-of-meal-prep">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preload" href="/assets/fonts/plex-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Person","@id":"https://matteomastore.com/#matteo","name":"Matteo Mastore","jobTitle":"Cloud and platform engineer","url":"https://matteomastore.com/","email":"mailto:matteo.mastore.job@gmail.com","image":"https://matteomastore.com/assets/og-card.png","alumniOf":{"@type":"CollegeOrUniversity","name":"Dundalk Institute of Technology"},"knowsLanguage":["Italian","English"],"sameAs":["https://github.com/matteooxx","https://www.linkedin.com/in/matteo-mastore"],"knowsAbout":["Cloud architecture","Platform engineering","Linux","Docker","Kubernetes","Observability","Site reliability"],"workLocation":{"@type":"Place","name":"Europe"}},{"@type":"WebSite","@id":"https://matteomastore.com/#website","url":"https://matteomastore.com/","name":"Matteo Mastore","inLanguage":"en","publisher":{"@id":"https://matteomastore.com/#matteo"}}]}</script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a class="brand" href="/index.html">
+        <span class="brand-mark" aria-hidden="true">MM</span>
+        <span class="brand-name">Matteo Mastore</span>
+      </a>
+      <button class="icon-button nav-toggle" type="button" aria-label="Open navigation" aria-controls="site-nav" aria-expanded="false" title="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="menu" aria-hidden="true"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+      </button>
+      <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+        <a href="/index.html">Home</a>
+        <a href="/about.html">About</a>
+        <a href="/experience.html">Experience</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="page-intro">
+      <div class="container page-intro-grid">
+        <div>
+          <p class="eyebrow">Case study</p>
+          <h1>King of Meal Prep</h1>
+        </div>
+        <p class="page-intro-copy">
+          A single-household kitchen platform where every change to stock is a
+          reversible transaction. It runs at home in a hardened container, keeps its
+          data in SQLite, and needs no cloud account to work.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Constraint</p>
+          <h2>One household, one box, no account anywhere</h2>
+        </div>
+        <div class="profile-grid">
+          <p class="eyebrow">Shape</p>
+          <div class="profile-copy">
+            <p>
+              The brief was a private system for one household, not a product for
+              many. That removed multi-tenancy and sign-up flows from the design, and
+              put the weight where the difficulty actually is: keeping a food
+              inventory honest while someone cooks from it, changes their mind, and
+              undoes things days later.
+            </p>
+            <p>
+              It serves a browser or an installed PWA behind a private reverse proxy.
+              One Gunicorn process with eight threads runs Flask, a read-write SQLite
+              application database, and a read-only SQLite nutrition index. An
+              external model API and SMTP are optional and off by default, so the
+              system keeps working when neither is reachable.
+            </p>
+            <p>
+              The reference container runs as an unprivileged user, drops all
+              capabilities, sets no-new-privileges, and mounts a read-only root
+              filesystem: only the runtime directory and a temporary filesystem are
+              writable. That decision comes back further down this page.
+            </p>
+            <p class="stack-line">Python, Flask, SQLite, Docker, PWA</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-muted">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Design</p>
+          <h2>Inventory is the hard part, so it is written as contracts</h2>
+          <p>Changing one of these rules requires tests and a migration note.</p>
+        </div>
+        <ul class="bullet-list">
+          <li><strong>A recipe yield is the yield of one ingredient list.</strong> A recipe yielding four portions consumes its list once when four portions are prepared, and half of it for two. Portions eaten stay a separate number from portions produced.</li>
+          <li><strong>Cooking is idempotent.</strong> Every cook transition carries an idempotency key, and repeating the same key returns the existing event instead of deducting stock twice. The guided step-by-step mode is not a second code path: it ends in the same transition.</li>
+          <li><strong>Undo compensates, it does not delete.</strong> It reverses recorded movements while preserving unrelated later edits, and refuses when a later use depends on it until that use is undone first.</li>
+          <li><strong>Prepared portions are consumed oldest-expiry first</strong>, and eating prepared food never touches raw pantry stock.</li>
+          <li><strong>Pantry identity is an exact canonical key</strong>, with arithmetic in grams, millilitres or pieces, while the original display unit survives for the interface.</li>
+          <li><strong>A split portion is derived, never duplicated.</strong> A 400 g row with a 200 g planned portion stays one row: a recipe taking 100 g leaves 300 g, shown as one and a half portions, and undoing that recipe restores both numbers.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Corrections</p>
+          <h2>Three things that were wrong</h2>
+          <p>Each one changed a contract, so each one is in the changelog rather than quietly patched.</p>
+        </div>
+        <ul class="bullet-list">
+          <li><strong>Ingredient use multiplied instead of scaling.</strong> The first implementation multiplied the full ingredient list by every portion eaten, so the pantry drained faster than the kitchen did. Ingredient use now scales by batch yield.</li>
+          <li><strong>Pantry matching used name substrings.</strong> Unrelated ingredients collapsed into one stock item whenever a name contained another. Matching now uses exact canonical keys, and an unknown name gets a stable key derived from it rather than joining an existing row.</li>
+          <li><strong>Unknown quantities claimed nutrition anyway.</strong> A quantity that could not be converted used to borrow an arbitrary per-100 gram value. It now keeps its missing state, its source and its confidence, because an uncertain number presented as fact is worse than a visible gap.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section section-muted">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Incident</p>
+          <h2>When hardening met a dependency upgrade</h2>
+        </div>
+        <div class="profile-grid">
+          <p class="eyebrow">Trade-off</p>
+          <div class="profile-copy">
+            <p>
+              Gunicorn 25.1 and later open a control socket under the home directory
+              when XDG_RUNTIME_DIR is unset. On a read-only root filesystem that write
+              fails, and the container logged an error on every single start.
+            </p>
+            <p>
+              The quick fix was to make the root filesystem writable again, trading a
+              security property for a log line. The fix that shipped points
+              XDG_RUNTIME_DIR at the temporary filesystem that is already writable, so
+              the process gets its socket and the read-only root survives the upgrade.
+            </p>
+            <p>
+              It is a small bug with a useful shape: hardening is not free, and the
+              cost tends to arrive later, through a dependency that assumed a writable
+              home directory.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Boundary</p>
+          <h2>What it deliberately is not</h2>
+        </div>
+        <div class="profile-grid">
+          <p class="eyebrow">Scope</p>
+          <div class="profile-copy">
+            <p>
+              It is not multi-user, not social, not public-facing, and not a medical
+              nutrition system: its estimates are not medical advice. Each exclusion
+              removed a class of work that would have competed with the part that
+              matters, which is an inventory that stays correct under undo.
+            </p>
+            <div class="project-links">
+              <a class="text-link" href="https://github.com/matteooxx/king-of-meal-prep" target="_blank" rel="noopener">
+                Source on GitHub
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="github" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+              </a>
+              <a class="text-link" href="/projects.html">
+                All projects
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-up-right" aria-hidden="true"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand footer-brand" href="/index.html">
+          <span class="brand-mark" aria-hidden="true">MM</span>
+          <span class="brand-name">Matteo Mastore</span>
+        </a>
+        <p>Cloud, platform, AI, and reliability engineering.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <a href="/about.html">About</a>
+        <a href="/experience.html">Experience</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="social-links">
+        <a class="icon-button" href="https://github.com/matteooxx" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="github" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg></a>
+        <a class="icon-button" href="https://www.linkedin.com/in/matteo-mastore" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="linkedin" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
+        <a class="icon-button" href="mailto:matteo.mastore.job@gmail.com" aria-label="Email" title="Email"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="mail" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg></a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; <span data-year></span> Matteo Mastore</span>
+      <span>Europe</span>
+    </div>
+  </footer>
+  <script src="/script.js"></script>
+</body>
+</html>
