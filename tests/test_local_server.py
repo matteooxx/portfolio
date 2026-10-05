@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import sqlite3
 import tempfile
 import unittest
@@ -23,7 +24,9 @@ class LocalContactTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "contacts.db"
             submission_id = ContactStore(path).add(data)
-            with sqlite3.connect(path) as conn:
+            # sqlite3's context manager commits but does not close, and an
+            # open handle stops Windows from removing the directory.
+            with contextlib.closing(sqlite3.connect(path)) as conn:
                 row = conn.execute(
                     "SELECT id, email FROM submissions"
                 ).fetchone()

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import sqlite3
@@ -72,7 +73,9 @@ class ContactStore:
         now = int(time.time())
         received_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
         expires_at = now + self.retention_days * 86400
-        with self._connect() as conn:
+        # sqlite3's context manager commits but never closes, so each call
+        # would leak a connection and keep the database file open.
+        with contextlib.closing(self._connect()) as conn, conn:
             conn.execute("DELETE FROM submissions WHERE expires_at < ?", (now,))
             conn.execute(
                 """
