@@ -188,6 +188,100 @@ behavior, project filters, full-size screenshots, one real contact message on
 the live site, local contact submission, focus visibility, reduced motion, the browser console, and
 that no phone number or CV download is published.
 
+### Prerequisites
+
+Node 22 and Python 3.12, the versions `.github/workflows/ci.yml` pins. Nothing
+is installed: there is no `requirements.txt` and no `package.json`, every
+import is standard library, and `node --test` is built in. `make check` also
+needs `bash`, because `tests/test_cloudflare_export.py` shells out to
+`scripts/build-cloudflare-pages.sh`. A host with Python but no Node runs only
+`python3 -m unittest discover -s tests`, not `make check`.
+
+`scripts/build-cloudflare-pages.sh` is tracked mode `100755`. An archive
+extraction that drops the exec bit shows up as a `git status` modification with
+zero insertions and deletions; restore it with `chmod u+x` rather than
+committing the loss. The Makefile invokes it as `bash scripts/...`, so the
+build still works without the bit - which is precisely why losing it is easy to
+miss.
+
+### Disposable Verification
+
+Two throwaway paths, sources mounted read-only so a run cannot write into the
+checkout. `local_server.py` binds `127.0.0.1` by default, so a container needs
+`PORTFOLIO_HOST=0.0.0.0`, and `CONTACT_DB_PATH` must point outside the mount or
+the SQLite open fails on the read-only filesystem.
+
+Path A, the supported entry point in a container:
+
+```bash
+CID=$(docker run -d -p 127.0.0.1:18100:18100         -e PORTFOLIO_HOST=0.0.0.0 -e PORTFOLIO_PORT=18100         -e CONTACT_DB_PATH=/tmp/contacts.db         -v "$PWD":/site:ro -w /site         python:3.12-slim python3 local_server.py)
+curl -s -o /dev/null -w '%{http_code}
+' http://127.0.0.1:18100/api/health
+curl -s http://127.0.0.1:18100/index.html | grep -c 'Matteo Mastore'
+docker rm -f "$CID"
+```
+
+Expected: `200` for `/api/health`, and `10` for the home page - a bare status
+code cannot tell an empty 200 from a rendered page, so assert the text. All 31
+public URLs answer `200` with a non-empty body: `/` and the seven root pages,
+the five `work/*.html` case studies, `style.css`, `script.js`,
+`contact-config.js`, `robots.txt`, `sitemap.xml`, the three icons, the four
+`assets/` images and `LUCIDE-LICENSE.txt`, the three subset fonts and
+`OFL-IBM-Plex.txt`, and `/api/health`. `POST /api/contact` with a valid JSON body returns
+`{"success": true, ...}` and a `submissionId`; a malformed address returns
+`400`. Every page carries `X-Content-Type-Options`, `Referrer-Policy` and
+`X-Frame-Options`. Resolving each `href`/`src` against its own page and
+fetching it gives 176 links, 0 broken - worth running, because
+`test_local_references_exist` skips any reference starting with `/` and the
+`work/` pages use nothing else.
+
+Use `python3 -m http.server` only as a fallback: it has no `/api/contact`, no
+`/api/health` and none of the response headers.
+
+Path B, a clean stock runtime:
+
+```bash
+docker run --rm -v "$PWD":/src:ro -w /work --tmpfs /work:rw,exec,size=1g   node:22-slim sh -c '
+    set -e
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update -qq && apt-get install -y -qq make python3
+    cp -r /src/. /work/ && chmod -R u+rwX /work
+    make check'
+```
+
+Expected: `node --check` clean on `script.js` and `worker/index.mjs`,
+`# pass 13 / # fail 0` from `node --test tests/worker.test.mjs`, the five
+`test -f` asset lines, then `Ran 18 tests ... OK` from unittest, with
+`Cloudflare Pages export ready` and `Files: 30` printed by the export test.
+31 tests in total. `make cloudflare-build` prints the same `Files: 30`.
+Splitting the paths also works and needs no `apt-get`: `python:3.12-slim` for
+`python -m unittest discover -s tests -v` (18 tests) and `node:22-slim` for the
+three Node lines (13 tests).
+
+Mount read-only and copy to a tmpfs. `python:3.12-slim` and `node:22-slim` both
+default to root, which matters because every archive file is mode `0660`: a
+container running as a non-root user cannot read the sources at all.
+
+### Why The 404 Regression Was Invisible
+
+`assets.not_found_handling` is `404-page`, so Cloudflare returns the same
+`404.html` for any unmatched path at any depth. Its relative references
+therefore resolved against the request URL: `/nope` was fine, but `/work/nope`
+asked for `/work/style.css`, `/work/script.js`, both preloaded fonts and all
+seven navigation links. Nothing caught it - `test_local_references_exist`
+resolves relative references against the repository root, which is correct for
+every page except the one served from arbitrary paths, and a manual check of a
+root-level miss renders perfectly. `test_the_not_found_page_is_depth_independent`
+now rejects any relative local reference in `404.html`.
+
+### This Archive Copy Deploys Nothing
+
+`https://matteomastore.com` is served by Cloudflare Workers, deployed by
+Workers Builds from the `main` branch of `github.com/matteooxx/portfolio`.
+This NAS archive copy has no Git remote and publishes nothing: editing here
+does not change the live site, and nothing in this handbook asks for a
+`wrangler` login, a Cloudflare API call, or a deployment.
+
 ## Publication
 
 Run working-tree and history secret scans before publication. Publish only the
