@@ -94,6 +94,26 @@ class StaticSiteTests(unittest.TestCase):
                     f"{page_name} references missing file {parsed.path}",
                 )
 
+    def test_the_not_found_page_is_depth_independent(self) -> None:
+        # wrangler.jsonc returns 404.html for every unmatched path, so a
+        # relative reference in that one page resolves against the request
+        # URL and not the site root: at /work/missing, "style.css" means
+        # /work/style.css. A miss at the root hides this, so keep every
+        # local reference in 404.html root-relative.
+        parser = ReferenceParser()
+        parser.feed((ROOT / "404.html").read_text(encoding="utf-8"))
+        for reference in parser.references:
+            if urlsplit(reference).scheme or reference.startswith("#"):
+                continue
+            self.assertTrue(
+                reference.startswith("/"),
+                f"404.html reference {reference} breaks below the site root",
+            )
+            self.assertTrue(
+                (ROOT / reference.lstrip("/")).is_file(),
+                f"404.html references missing file {reference}",
+            )
+
     def test_stale_public_claims_are_absent(self) -> None:
         text = "\n".join(
             (ROOT / page).read_text(encoding="utf-8") for page in PAGES
