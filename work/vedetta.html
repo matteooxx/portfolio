@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Vedetta, a self-hosted monitor for employers' own job boards, built around one asymmetry: a filter that wrongly drops a posting fails silently, so labels decide the order of the digest and never what appears in it.">
+  <meta name="theme-color" content="#ffffff">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Matteo Mastore">
+  <meta property="og:url" content="https://matteomastore.com/work/vedetta">
+  <meta property="og:title" content="Vedetta case study - Matteo Mastore">
+  <meta property="og:description" content="Vedetta, a self-hosted monitor for employers' own job boards, built around one asymmetry: a filter that wrongly drops a posting fails silently, so labels decide the order of the digest and never what appears in it.">
+  <meta property="og:image" content="https://matteomastore.com/assets/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Matteo Mastore - cloud and solutions engineering portfolio">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Vedetta case study - Matteo Mastore</title>
+  <link rel="canonical" href="https://matteomastore.com/work/vedetta">
+  <link rel="icon" href="/favicon.ico" sizes="32x32">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preload" href="/assets/fonts/plex-sans-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/plex-mono-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/style.css">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Person","@id":"https://matteomastore.com/#matteo","name":"Matteo Mastore","jobTitle":"Cloud and platform engineer","url":"https://matteomastore.com/","email":"mailto:matteo.mastore.job@gmail.com","image":"https://matteomastore.com/assets/og-card.png","alumniOf":{"@type":"CollegeOrUniversity","name":"Dundalk Institute of Technology"},"knowsLanguage":["Italian","English"],"sameAs":["https://github.com/matteooxx","https://www.linkedin.com/in/matteo-mastore"],"knowsAbout":["Cloud architecture","Platform engineering","Linux","Docker","Kubernetes","Observability","Site reliability"],"workLocation":{"@type":"Place","name":"Europe"}},{"@type":"WebSite","@id":"https://matteomastore.com/#website","url":"https://matteomastore.com/","name":"Matteo Mastore","inLanguage":"en","publisher":{"@id":"https://matteomastore.com/#matteo"}}]}</script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a class="brand" href="/index.html">
+        <span class="brand-mark" aria-hidden="true">MM</span>
+        <span class="brand-name">Matteo Mastore</span>
+      </a>
+      <button class="icon-button nav-toggle" type="button" aria-label="Open navigation" aria-controls="site-nav" aria-expanded="false" title="Menu">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="menu" aria-hidden="true"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg>
+      </button>
+      <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+        <a href="/index.html">Home</a>
+        <a href="/about.html">About</a>
+        <a href="/experience.html">Experience</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/cv.html">CV</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="page-intro">
+      <div class="container page-intro-grid">
+        <div>
+          <p class="eyebrow">Case study</p>
+          <h1>Vedetta</h1>
+        </div>
+        <p class="page-intro-copy">
+          A self-hosted monitor for employers' own job boards: once a day it reads
+          the careers listings you choose, works out what is genuinely new, labels
+          each posting with the facts that decide whether it is worth your time,
+          and sends one email. The engineering is not the reading. It is that
+          everything in it follows from one asymmetry.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Premise</p>
+          <h2>A missed posting is silent; an irrelevant one costs two seconds</h2>
+        </div>
+        <div class="profile-grid">
+          <p class="eyebrow">Asymmetry</p>
+          <div class="profile-copy">
+            <p>
+              The project exists because of one specific failure: a filtered search
+              of a single careers portal passed over an eligible vacancy, which a
+              second, unfiltered pass found an hour later. The filter was not
+              reported as having decided anything. It simply returned a shorter
+              list.
+            </p>
+            <p>
+              <strong>So nothing is ever hidden.</strong> The labels decide the
+              order of the digest, never what appears in it. A posting the ranking
+              dislikes is still there, further down, with the reasons shown so the
+              reader can disagree with them in a second.
+            </p>
+            <p>
+              That is the whole design, not a preference. A filter that wrongly
+              drops a posting fails silently and nothing ever tells you it
+              happened. An irrelevant posting costs two seconds of reading. When
+              one error is invisible and unbounded and the other is visible and
+              trivial, the system should be built to make only the second kind.
+            </p>
+            <p class="stack-line">Python, Flask, SQLite, Docker, schema.org, self-hosted</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-muted">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Consequence</p>
+          <h2>Silence is never allowed to look like "nothing new"</h2>
+        </div>
+        <p>
+          The same reasoning decides what happens when a part of the system
+          breaks. An absent result and an empty result are different facts, and a
+          monitor that confuses them is worse than no monitor, because it is
+          quietly trusted.
+        </p>
+        <ul class="bullet-list">
+          <li><strong>Every source is polled and every poll is recorded</strong>, failures and empty results included. A source that breaks appears in the digest rather than disappearing from it.</li>
+          <li><strong>An employer with no working route is listed as unwatched</strong>, instead of simply not being there.</li>
+          <li><strong>Several routes to the same employer are polled where they exist.</strong> If one goes quiet while another still answers, that is a detected fault, not a closed job.</li>
+          <li><strong>A posting that might be a duplicate is shown twice and flagged</strong>, never merged away. Merging wrongly hides something; a duplicate costs a glance.</li>
+          <li><strong>The email arrives even on a day when nothing is new</strong>, so a missing email always means a fault rather than a quiet day.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Verification</p>
+          <h2>Three automated methods each confidently bound the wrong company</h2>
+        </div>
+        <p>
+          A source is only polled once a person has looked at real postings from it
+          and confirmed they belong to the employer that was asked for. That
+          requirement is recorded as a verification date, and it is not ceremony.
+        </p>
+        <ul class="bullet-list">
+          <li>While the project was being built, three completely independent automated discovery methods each returned a <strong>different company</strong> than the one requested: a road-paving contractor in Florida offered as an asset manager, a Brazilian business school as a technology firm, and a vendor's demo board whose single posting was titled "Test Position".</li>
+          <li><strong>All three looked like success.</strong> HTTP 200, valid JSON, plausible row counts. There was no error to catch and no exception to log.</li>
+          <li>An employer silently bound to the wrong board produces a permanently empty feed that is <strong>indistinguishable from a quiet employer</strong> - the exact failure the whole project was built to prevent, reintroduced through the back door by the convenience of automatic setup.</li>
+        </ul>
+        <p>
+          So automatic discovery may propose; a human enrols. It is the one place
+          where the system deliberately refuses to be fully automatic, because it
+          is the one place where being wrong is undetectable afterwards.
+        </p>
+      </div>
+    </section>
+
+    <section class="section section-muted">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Rules</p>
+          <h2>Three corrections the first real run forced</h2>
+        </div>
+        <div class="profile-grid">
+          <p class="eyebrow">Data</p>
+          <div class="profile-copy">
+            <p>
+              A rule is a few lines of configuration carrying a human-readable
+              explanation, and that explanation is what appears beside the posting
+              in the digest. If a one-line reason a person would accept cannot be
+              written, the rule is not ready. Running it against real postings
+              changed the shape of the rule language three times.
+            </p>
+            <p>
+              <strong>A rule needs an escape clause.</strong> A language listed as
+              <em>required</em> should disqualify a posting; the same language
+              listed as <em>a strong asset</em> should not. Without that
+              distinction a language rule is wrong about half the time, so every
+              rule carries an <code>unless</code> condition alongside its match.
+            </p>
+            <p>
+              <strong>A rule needs to say what it reads.</strong> The first real
+              run labelled a "Senior Backend Engineer" as early-career, because the
+              word "graduate" sits in the boilerplate of almost every long job
+              description. Seniority and role rules now read the title; disqualifying
+              rules read everything.
+            </p>
+            <p>
+              <strong>A rule needs a weight.</strong> Without one, being in a target
+              role outweighed nothing in particular, and an "Associate Renewals
+              Manager" ranked alongside a "Cloud Engineer" - which the first run did
+              in fact do.
+            </p>
+            <p>
+              Ranking is a plain sum over the labels: deliberately arithmetic over
+              visible facts rather than a learned similarity, so the order can be
+              explained in one line and argued with.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Coverage</p>
+          <h2>One adapter per platform, and one path that ignores the platform</h2>
+        </div>
+        <p>
+          Employers do not run their own job boards; they buy them. So an adapter
+          is written once per hiring platform and serves every employer on it,
+          which makes coverage grow per platform rather than per employer. Four
+          implemented paths currently reach 36 confirmed sources across 40
+          employers on the author's own watchlist.
+        </p>
+        <ul class="bullet-list">
+          <li><strong>The platform adapters</strong> answer unauthenticated requests with clean JSON carrying stable posting identifiers and publication dates, so no headless browser is needed anywhere in the system.</li>
+          <li><strong>The path that needs no platform at all:</strong> many careers sites publish a sitemap listing every job URL, and their detail pages carry schema.org job markup because search engines reward it. That combination needs no API, no tenant and no identifier - one request gives the whole set, and detail pages are fetched only for URLs that are new. It is the only route that does not care what software the employer bought.</li>
+          <li><strong>Its catch, found within an hour of testing:</strong> the pattern separating job pages from content pages has to be configured per source. A single global pattern was wrong in both directions - loose enough to match a careers blog, strict enough to lose an employer whose postings live under opaque identifiers.</li>
+        </ul>
+        <p>
+          Crawling is deliberately quiet: the robots file is read before a host is
+          touched, requests identify themselves, each source is polled once a day
+          and conditionally where the platform supports it. On a day with no new
+          postings an employer costs a single small request.
+        </p>
+      </div>
+    </section>
+
+    <section class="section section-muted">
+      <div class="container">
+        <div class="section-heading">
+          <p class="eyebrow">Boundary</p>
+          <h2>It signals; it does not decide</h2>
+        </div>
+        <div class="profile-grid">
+          <p class="eyebrow">Scope</p>
+          <div class="profile-copy">
+            <p>
+              The name is the Italian word for a lookout: the one who keeps watch
+              and signals, and does not decide what the signal means. It does not
+              apply to anything, does not write or submit applications, does not
+              scrape aggregators or social networks, and exposes nothing to the
+              internet. It is a scheduled job that sends mail.
+            </p>
+            <p>
+              <strong>It does not judge fit.</strong> It extracts and labels facts
+              and leaves the verdict to the reader, because a label can be argued
+              with and a verdict can only be trusted. A model may optionally be
+              pointed at pages that resist deterministic parsing, for extraction
+              and labelling only; it is off by default, the program is fully
+              functional without it, and it is never allowed to produce a verdict.
+            </p>
+            <p>
+              <strong>Mechanism in the code, the case in the configuration.</strong>
+              There is nothing about any particular person or job market in the
+              source, which is why it could be published without being taken apart
+              first: where you may work, which employers to watch and what counts
+              as a blocker all live in configuration files. The design record -
+              seventeen decisions, each with the reasoning that produced it - is
+              published with it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand footer-brand" href="/index.html">
+          <span class="brand-mark" aria-hidden="true">MM</span>
+          <span class="brand-name">Matteo Mastore</span>
+        </a>
+        <p>Cloud, platform, AI, and reliability engineering.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer navigation">
+        <a href="/about.html">About</a>
+        <a href="/experience.html">Experience</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/cv.html">CV</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="social-links">
+        <a class="icon-button" href="https://github.com/matteooxx" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="github" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg></a>
+        <a class="icon-button" href="https://www.linkedin.com/in/matteo-mastore" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="linkedin" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect width="4" height="12" x="2" y="9"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
+        <a class="icon-button" href="mailto:matteo.mastore.job@gmail.com" aria-label="Email" title="Email"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="mail" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg></a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>&copy; <span data-year></span> Matteo Mastore</span>
+      <span>Europe</span>
+    </div>
+  </footer>
+  <script src="/script.js"></script>
+</body>
+</html>

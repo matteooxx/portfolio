@@ -33,6 +33,7 @@ PUBLIC_FILES = {
     "work/recsbot.html",
     "work/taste-platform.html",
     "work/home-server.html",
+    "work/vedetta.html",
     "assets/LUCIDE-LICENSE.txt",
     "assets/fonts/OFL-IBM-Plex.txt",
     "assets/fonts/plex-mono-400.woff2",

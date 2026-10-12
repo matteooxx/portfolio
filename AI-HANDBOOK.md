@@ -26,8 +26,8 @@ The public pages are:
 - Evolumia's supported metrics are more than 20 server/NAS systems maintained
   and a 30% downtime reduction through proactive health checks and automation.
 - Outlier AI work covers model-output evaluation and structured feedback.
-- King of Meal Prep, recsbot, Taste Platform, Home Server NAS Platform, and
-  this portfolio are personal work.
+- King of Meal Prep, recsbot, Taste Platform, Vedetta, Home Server NAS
+  Platform, and this portfolio are personal work.
 - Tensei, SafeZone, Project ARIA, and the IoT Traffic Control System must retain
   explicit group attribution.
 - SafeZone is a high-level public narrative only. Never add its source,
@@ -62,8 +62,16 @@ The public pages are:
   (such as Nmap, Scrapy, and boto3) stay off the site, and Stage 4 modules
   were not taken.
 - Source links may point only to the public personal repositories
-  `king-of-meal-prep`, `recsbot`, `taste-platform`, and `portfolio`. Never link
-  group, private, or legacy repositories.
+  `king-of-meal-prep`, `recsbot`, `taste-platform`, `vedetta`, and
+  `portfolio`. Never link group, private, or legacy repositories. The three
+  archived utility repositories (`House-scraper`, `whisper-transcriber`,
+  `yt-mp3-downloader`) stay off the site: the portfolio does not describe
+  them.
+- Vedetta is published under MIT at `matteooxx/vedetta` with its design
+  record. Its watchlist, profile and targeting rules are private and live
+  only on the operator's server: never publish an employer name, a rule, or
+  anything from `private-ops/vedetta/`. The public numbers are the ones in
+  its own README (36 confirmed sources across 40 employers).
 
 ## Visual Assets
 

@@ -23,6 +23,7 @@ PAGES = (
     "work/recsbot.html",
     "work/taste-platform.html",
     "work/home-server.html",
+    "work/vedetta.html",
     "404.html",
 )
 
@@ -132,7 +133,13 @@ class StaticSiteTests(unittest.TestCase):
     def test_source_links_point_only_to_public_personal_repositories(
         self,
     ) -> None:
-        allowed = {"king-of-meal-prep", "recsbot", "taste-platform", "portfolio"}
+        allowed = {
+            "king-of-meal-prep",
+            "recsbot",
+            "taste-platform",
+            "portfolio",
+            "vedetta",
+        }
         for page_name in PAGES:
             parser = ReferenceParser()
             parser.feed((ROOT / page_name).read_text(encoding="utf-8"))
