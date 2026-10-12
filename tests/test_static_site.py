@@ -6,6 +6,7 @@ import json
 import re
 import struct
 import unittest
+from datetime import date
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -288,6 +289,28 @@ class StaticSiteTests(unittest.TestCase):
         robots = (ROOT / "robots.txt").read_text(encoding="utf-8")
         self.assertIn("Sitemap: https://matteomastore.com/sitemap.xml", robots)
         self.assertIn("Disallow: /api/", robots)
+
+    def test_every_sitemap_entry_carries_a_plausible_lastmod(self) -> None:
+        """A page added without a date tells a crawler nothing has changed.
+
+        Two entries were published with no `lastmod` at all, and five kept a
+        date from before their last edit, which is worse than none: it asserts
+        the page is older than it is. Equality with the commit date is not
+        asserted, because a page and this file change in the same commit.
+        """
+        sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+        entries = re.findall(r"<url>(.*?)</url>", sitemap, re.S)
+        self.assertTrue(entries)
+        today = date.today()
+        for entry in entries:
+            loc = re.search(r"<loc>(.*?)</loc>", entry).group(1)
+            stamps = re.findall(r"<lastmod>(.*?)</lastmod>", entry)
+            self.assertEqual(len(stamps), 1, f"{loc}: expected one lastmod")
+            try:
+                stamped = date.fromisoformat(stamps[0])
+            except ValueError:  # pragma: no cover - the assertion reports it
+                self.fail(f"{loc}: lastmod {stamps[0]!r} is not a date")
+            self.assertLessEqual(stamped, today, f"{loc}: lastmod is in the future")
 
     def test_private_phone_and_cv_are_not_published(self) -> None:
         html = "\n".join(
