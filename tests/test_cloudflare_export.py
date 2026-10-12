@@ -42,6 +42,7 @@ PUBLIC_FILES = {
     "assets/king-meal-prep.webp",
     "assets/og-card.png",
     "assets/recsbot-interface.webp",
+    "assets/vedetta-interface.webp",
 }
 
 

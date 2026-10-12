@@ -75,9 +75,18 @@ The public pages are:
 
 ## Visual Assets
 
-`assets/king-meal-prep.webp` and `assets/recsbot-interface.webp` were captured
-from isolated local copies of the sanitized personal projects. Both used fresh
-databases and synthetic content. They may be published with this portfolio.
+`assets/king-meal-prep.webp`, `assets/recsbot-interface.webp` and
+`assets/vedetta-interface.webp` were captured from isolated local copies of the
+sanitized personal projects. All three used fresh databases and synthetic
+content. They may be published with this portfolio.
+
+The Vedetta capture came from a throwaway clone with its own virtualenv and an
+empty database: the two real employers in the shipped example watchlist were
+deleted before seeding, and every employer, posting and location in the image
+is invented. Never capture it from the server runtime, which holds the real
+watchlist and targeting rules. It is stored lossless (VP8L) because a flat
+interface screenshot is both smaller and sharper that way than as lossy VP8;
+`webp_size` in `tests/test_static_site.py` reads both headers.
 
 Do not replace them with screenshots from private NAS runtimes or real user
 data. Do not add screenshots from SafeZone, Tensei, Project ARIA, customer

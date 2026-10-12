@@ -29,13 +29,25 @@ PAGES = (
 
 
 def webp_size(path: Path) -> tuple[int, int]:
-    """Read the pixel size of a lossy (VP8) WebP file without Pillow."""
+    """Read the pixel size of a WebP file without Pillow.
+
+    Both encodings are published: photographic previews compress smaller as
+    lossy VP8, while a flat interface screenshot is both smaller and sharper
+    as lossless VP8L, so the header layout has to be chosen per file.
+    """
     data = path.read_bytes()
-    if data[:4] != b"RIFF" or data[8:12] != b"WEBP" or data[12:16] != b"VP8 ":
-        raise AssertionError(f"{path.name} is not a lossy WebP file")
-    width = int.from_bytes(data[26:28], "little") & 0x3FFF
-    height = int.from_bytes(data[28:30], "little") & 0x3FFF
-    return width, height
+    if data[:4] != b"RIFF" or data[8:12] != b"WEBP":
+        raise AssertionError(f"{path.name} is not a WebP file")
+    fourcc = data[12:16]
+    if fourcc == b"VP8 ":
+        width = int.from_bytes(data[26:28], "little") & 0x3FFF
+        height = int.from_bytes(data[28:30], "little") & 0x3FFF
+        return width, height
+    if fourcc == b"VP8L":
+        # One signature byte, then width-1 and height-1 as 14 bits each.
+        bits = int.from_bytes(data[21:25], "little")
+        return (bits & 0x3FFF) + 1, ((bits >> 14) & 0x3FFF) + 1
+    raise AssertionError(f"{path.name} is not a VP8 or VP8L WebP file")
 
 
 class ReferenceParser(HTMLParser):
@@ -164,6 +176,7 @@ class StaticSiteTests(unittest.TestCase):
         for relative in (
             "assets/king-meal-prep.webp",
             "assets/recsbot-interface.webp",
+            "assets/vedetta-interface.webp",
         ):
             self.assertEqual(webp_size(ROOT / relative), (1440, 900), relative)
 
