@@ -41,8 +41,12 @@ The public pages are:
   internal tool or process names beyond the public AWS service names, AWS
   OpsWorks, Amazon Q for QuickSight, Amazon RDS, production ownership, formal
   on-call, and any AWS certification.
-- Evolumia's supported metrics are more than 20 server/NAS systems maintained
-  and a 30% downtime reduction through proactive health checks and automation.
+- Evolumia's one supported metric is more than 20 server/NAS systems
+  maintained. The **30% downtime reduction is retired** (operator's decision,
+  20 October 2026): it was his own estimate and the co-founder never confirmed
+  it, so it is off the site and must not come back. What may be said is the
+  work itself - SMART disk monitoring, RAID health checks and automated log
+  analysis put in place - with no claimed effect attached to it.
 - Outlier AI work covers model-output evaluation and structured feedback.
 - King of Meal Prep, recsbot, Taste Platform, Vedetta, Home Server NAS
   Platform, and this portfolio are personal work.

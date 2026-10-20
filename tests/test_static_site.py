@@ -149,6 +149,10 @@ class StaticSiteTests(unittest.TestCase):
             "coursework complete",
             "(Hons)",
             "Honours",
+            # The operator's own estimate, never confirmed by the employer,
+            # retired from the site on 20 October 2026.
+            "30%",
+            "Reduced downtime",
             # Named in the programme's public posting, never confirmed here.
             "OpsWorks",
             "QuickSight",
