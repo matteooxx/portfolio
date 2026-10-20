@@ -126,6 +126,10 @@ class StaticSiteTests(unittest.TestCase):
             "AIF-C01 - Preparing",
             "fully serverless portfolio hosted on AWS",
             "working contact form with spam protection",
+            # The internship was written as training in sandboxes until the
+            # operator confirmed its real scope on 12 October 2026.
+            "sandboxed environments",
+            "simulated deployment scenarios",
         )
         for phrase in stale:
             self.assertNotIn(phrase, text)
@@ -145,6 +149,16 @@ class StaticSiteTests(unittest.TestCase):
             "coursework complete",
             "(Hons)",
             "Honours",
+            # Named in the programme's public posting, never confirmed here.
+            "OpsWorks",
+            "QuickSight",
+            # The leadership attestation is for a peer team lead, and covers
+            # SafeZone alone.
+            "managed a five-person",
+            "sole architect",
+            # The mentor's phrase about ARIA refers to the hosted browser
+            # simulation, not to a kiosk that ran.
+            "deployed on live infrastructure",
         )
         for phrase in corrected:
             self.assertNotIn(phrase, text)
@@ -192,6 +206,9 @@ class StaticSiteTests(unittest.TestCase):
         self.assertIn("Group architecture concept", projects)
         self.assertIn("SafeZone is presented only through a high-level", projects)
         self.assertNotIn("safezone/", projects.casefold())
+        # The leadership claim is attested, but only as a lead among peers:
+        # the caveat travels with it.
+        self.assertIn("team lead among peers", projects)
 
     def test_project_images_have_stable_dimensions(self) -> None:
         for relative in (

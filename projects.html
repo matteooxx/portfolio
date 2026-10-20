@@ -200,8 +200,9 @@
                 <li>Records every poll including failures and empty results, so a broken source appears in the digest instead of disappearing from it.</li>
                 <li>Requires a human to confirm a source before it is polled, after three automated discovery methods each bound the wrong company while returning valid responses.</li>
                 <li>Keeps mechanism in code and the case in configuration, which is why it could be published unchanged.</li>
+                <li>Runs as a hardened container job on a cron schedule - read-only root filesystem, capabilities dropped, resource limits - kept separate from the interface, because a stopped interface must not be able to mean no digest.</li>
               </ul>
-              <p class="stack-line">Python, Flask, SQLite, Docker, schema.org, deterministic rule engine</p>
+              <p class="stack-line">Python, Flask, SQLite, Docker and container hardening, cron, schema.org, deterministic rule engine, GitHub Actions</p>
               <div class="project-links">
                 <a class="text-link" href="https://github.com/matteooxx/vedetta" target="_blank" rel="noopener" aria-label="Vedetta source on GitHub">
                   Source on GitHub
@@ -304,10 +305,11 @@
                 <span>2026</span>
               </div>
               <h2>SafeZone Crisis Response</h2>
-              <p>Served as Platform and Frontend Integration owner for a demo-ready community crisis-response prototype.</p>
+              <p>Led the five-person intern team and owned platform and frontend integration for a demo-ready community crisis-response prototype.</p>
               <ul class="project-points">
+                <li>Set the goals, timeline and weekly cadence, and coordinated with managers and mentors through to the final presentation - team lead among peers, with each domain feature credited to the teammate who built it.</li>
                 <li>Integrated independently owned React pages through coherent routing and responsive navigation.</li>
-                <li>Coordinated the shared API and authentication boundary, static delivery workstream, final demo flow, and architecture / AI-trust narrative.</li>
+                <li>Coordinated the shared API and authentication boundary, stood up static hosting early, and prepared the final demo flow and the architecture / AI-trust narrative.</li>
               </ul>
               <p class="stack-line">React, JavaScript, serverless architecture, API integration, static cloud delivery</p>
             </div>
@@ -331,6 +333,7 @@
               <ul class="project-points">
                 <li>Evaluated language and voice support, regional model availability, cross-region data constraints, and edge assumptions.</li>
                 <li>Helped replace a universal-pipeline assumption with language-specific paths, explicit degradation, and human escalation.</li>
+                <li>Built the interactive simulation of the architecture, showing how the concept responds to failures; teammates adopted it for their own presentations.</li>
               </ul>
               <p class="stack-line">HTML, CSS, JavaScript, failure simulation, accessibility, edge/cloud architecture</p>
             </div>

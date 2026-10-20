@@ -222,6 +222,56 @@
     <section class="section section-muted">
       <div class="container">
         <div class="section-heading">
+          <p class="eyebrow">Operation</p>
+          <h2>The watch is kept apart from the thing that shows it</h2>
+        </div>
+        <div class="profile-grid">
+          <p class="eyebrow">Runtime</p>
+          <div class="profile-copy">
+            <p>
+              One image, two roles. The daily run is a throwaway container started
+              by a cron schedule, with a read-only root filesystem, every Linux
+              capability dropped, no new privileges, memory, CPU and process
+              limits, a <code>noexec</code> temporary filesystem and its
+              configuration mounted read-only. It runs as a non-root user and
+              touches nothing it does not need: it reads job boards and writes one
+              database and one outbox.
+            </p>
+            <p>
+              <strong>The interface is a separate service</strong>, bound to
+              loopback and published only over a private network, never to the LAN
+              or the internet. That separation is the point: if the run lived
+              inside the interface, a stopped interface would mean no digest - and
+              no digest is exactly what this project treats as an alarm rather than
+              as silence.
+            </p>
+            <p>
+              <strong>Delivery assumes it will fail.</strong> The application
+              writes digests to an outbox and a delivery step sends them through
+              the server's own mail configuration, so no third-party mail
+              credential exists to leak. An undelivered digest stays queued and is
+              retried; a failed run sends an alert with the last lines of its log.
+              Its data lives on a dataset with a daily snapshot task, off the
+              server's single-disk boot pool.
+            </p>
+            <p>
+              <strong>Changes are predicted before they are saved.</strong> The
+              test suite runs with no network access, in CI against the oldest
+              supported Python and the version the container runs. On top of that,
+              editing the rules judges every open posting under both the old and
+              the new configuration first and lists what would stop being
+              workable - which, run against the live database, found five defects
+              the tests had passed, one of them wide enough to let a whole
+              continent through.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
           <p class="eyebrow">Boundary</p>
           <h2>It signals; it does not decide</h2>
         </div>

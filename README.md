@@ -1,7 +1,8 @@
 # Portfolio
 
 Matteo Mastore's static multi-page portfolio, refreshed from evidence-backed
-career briefings and canonical CV facts on 11 September 2026.
+career briefings and canonical CV facts on 11 September 2026 and realigned to
+them on 20 October 2026.
 
 The site covers:
 
@@ -42,6 +43,9 @@ after 90 days by default.
 - `about.html`: profile, skills, education, training, and languages
 - `experience.html`: employment and applied engineering
 - `projects.html`: filterable evidence-calibrated project inventory
+- `cv.html`: the curriculum vitae, built from the canonical CV facts
+- `work/`: one case study per personal project (`vedetta`, `home-server`,
+  `king-of-meal-prep`, `recsbot`, `taste-platform`)
 - `contact.html`: contact details and form
 - `404.html`: Cloudflare-compatible not-found response
 - `assets/`: synthetic project previews, subset fonts, and the link-preview card

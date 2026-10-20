@@ -7,7 +7,9 @@ Read this file before changing or publishing the project.
 This personal project is a public-ready static portfolio with an optional
 provider-free local contact service. Content was refreshed from the NAS
 career briefings, the canonical targeted-CV facts, and the LinkedIn audit
-through 11 September 2026.
+through 11 September 2026, and realigned on 20 October 2026 to the canonical
+CV README and the master CV rebuilt from it on 15 October 2026 - which is the
+source of truth whenever this file or a page disagrees with it.
 
 The public pages are:
 
@@ -15,14 +17,30 @@ The public pages are:
 - `about.html`
 - `experience.html`
 - `projects.html`
+- `cv.html`
 - `contact.html`
+- `work/king-of-meal-prep.html`, `work/recsbot.html`,
+  `work/taste-platform.html`, `work/home-server.html`, `work/vedetta.html`
 
 ## Claim Boundaries
 
 - AWS employment is `Support Engineer Intern - Deployment`, March-August 2026.
-- AWS claims cover structured training, hands-on scenarios, troubleshooting,
-  service configuration, Amazon Q knowledge, and repeatable infrastructure
-  concepts. Do not invent customer cases or production ownership.
+- AWS claims cover what the operator confirmed on 12 October 2026 and the
+  canonical CV README records: **real customer cases** resolved through the
+  support contact channels (phone, email, chat) with root-cause
+  troubleshooting; **tools and scripts built for AWS Support Engineers**;
+  **support content written** to improve processes and reduce repeat contacts;
+  the programme's structured Cloud Support training; and hands-on work with the
+  Deployment-profile services - CloudFormation, CodePipeline, CodeBuild and
+  CodeDeploy, Elastic Beanstalk, ECS and EKS, Control Tower and Service
+  Catalog - plus blue/green and rolling deployments and Amazon Q Business and
+  Developer. The pages said "sandboxed" and "simulated scenarios" until
+  20 October 2026, which understated the role; that wording is retired.
+  Still not supported, and not to be written: any metric (case counts, CSAT,
+  resolution times, numbers of tools or users), customer names, case details,
+  internal tool or process names beyond the public AWS service names, AWS
+  OpsWorks, Amazon Q for QuickSight, Amazon RDS, production ownership, formal
+  on-call, and any AWS certification.
 - Evolumia's supported metrics are more than 20 server/NAS systems maintained
   and a 30% downtime reduction through proactive health checks and automation.
 - Outlier AI work covers model-output evaluation and structured feedback.
@@ -32,6 +50,24 @@ The public pages are:
   explicit group attribution.
 - SafeZone is a high-level public narrative only. Never add its source,
   screenshots, internal identifiers, live endpoints, or internal artifacts.
+- SafeZone team leadership is third-party attested (a public LinkedIn
+  recommendation by the operator's AWS mentor for the internship projects,
+  15 October 2026) and may be stated: led the five-person intern team, set
+  goals, timeline and a weekly cadence, coordinated with managers and mentors,
+  stood up the S3 and CloudFront hosting and a deployment target early, and
+  integrated every teammate's pages into one working application. Write "led",
+  never "managed" - a team lead among peers, not a people manager - never
+  "sole architect", never name a specific pipeline tool, and keep each domain
+  feature credited to the teammate who built it. The attestation covers
+  SafeZone only.
+- Project ARIA architecture judgement and the interactive simulation teammates
+  adopted are third-party attested (a public LinkedIn recommendation by the
+  operator's AWS TechU mentor, 15 October 2026) and may be stated. ARIA stays
+  a **concept**: the words "concept" and "simulation" stay in the wording, and
+  nothing on the site may say ARIA, a kiosk, or any of its services was
+  deployed or ran on live infrastructure - only the browser simulation was
+  hosted. Leadership on ARIA and Tensei is self-declared, not attested, and
+  stays off the site.
 - Tensei and Project ARIA repositories remain private pending rights approval.
 - A prototype is not a production service. Do not invent adoption, accuracy,
   latency, cost, availability, customer, or business-impact metrics.
@@ -72,6 +108,15 @@ The public pages are:
   only on the operator's server: never publish an employer name, a rule, or
   anything from `private-ops/vedetta/`. The public numbers are the ones in
   its own README (36 confirmed sources across 40 employers).
+- Vedetta's operation may be described as it is in its briefing: a cron-run
+  throwaway container with a read-only root filesystem, all capabilities
+  dropped, `no-new-privileges` and resource limits, a separate loopback-bound
+  interface published only over the private tailnet, an outbox that retries an
+  undelivered digest, an alert on a failed run, and a network-free pytest suite
+  in GitHub Actions on Python 3.11 and 3.12. Do not claim users, stars,
+  adoption, job-search outcomes, time saved, the unwritten Ashby or Lever
+  adapters, an implemented AI worker, or authentication in the web interface -
+  it has none by design.
 
 ## Visual Assets
 

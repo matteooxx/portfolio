@@ -58,9 +58,10 @@
         <p class="page-intro-copy">
           Computing graduate working across cloud support engineering, systems
           administration, full-stack delivery and applied model integration. Six
-          months on an AWS Deployment team, two years of paid work before that, and
-          a set of self-hosted products built to keep working when a dependency does
-          not.
+          months on an AWS Deployment team resolving customer cases to root cause,
+          a year of paid infrastructure and evaluation work before that, a
+          five-person intern team led to delivery, and a set of self-hosted
+          products built to keep working when a dependency does not.
         </p>
       </div>
     </section>
@@ -94,8 +95,10 @@
               <p class="eyebrow">Amazon Web Services</p>
               <h3>Support Engineer Intern, Deployment</h3>
               <ul class="bullet-list">
-                <li>Gained hands-on cloud experience in sandboxed environments, applying AWS service configuration and troubleshooting techniques in simulated deployment scenarios.</li>
-                <li>Built working knowledge of AI-assisted delivery tooling (Amazon Q Business and Developer) and completed structured training across core services, IAM, networking and deployment operations.</li>
+                <li>Resolved customer cases by phone, email and chat on the Deployment support team, troubleshooting CloudFormation, CodePipeline, Elastic Beanstalk and ECS/EKS issues to root cause.</li>
+                <li>Built tools and scripts for AWS Support Engineers and wrote support content to improve support processes and reduce repeat contacts.</li>
+                <li>Completed structured Cloud Support training across core services, IAM, networking and deployment operations, including blue/green and rolling deployments, Control Tower and Service Catalog, and worked with AI-assisted delivery tooling (Amazon Q Business and Developer).</li>
+                <li>Led a five-person intern team on a five-week serverless prototype: set goals, timeline and a weekly cadence, coordinated with managers and mentors, stood up S3 and CloudFront hosting early, and integrated every teammate's pages into one working application.</li>
                 <li>Collaborated with EMEA and Americas colleagues outside standard hours, working across time zones and communication styles.</li>
               </ul>
             </div>
@@ -151,6 +154,7 @@
               <li>Built a self-hosted monitor for employers' own job boards: per-platform adapters plus a sitemap and schema.org path reach 36 confirmed sources across 40 employers, polled once a day with the robots file honoured and conditional requests where supported.</li>
               <li>Designed it so labels order the digest and never filter it, every poll is recorded including failures, and a source must be confirmed by a person before it is used - after three automated discovery methods each bound the wrong employer while returning valid responses.</li>
               <li>Kept the rule engine deterministic and the ranking a plain sum over visible labels, with any model confined to an optional external worker that may extract but never judge.</li>
+              <li>Runs it daily as a hardened container job - read-only root filesystem, every Linux capability dropped, memory, CPU and process limits - kept separate from the web interface so a stopped interface cannot quietly mean no digest, with an outbox that retries an undelivered one; published under MIT with its design record, and tested in CI on Python 3.11 and 3.12.</li>
             </ul>
           </div>
         </article>
@@ -219,12 +223,13 @@
           </div>
         </article>
         <article class="cv-project">
-          <p class="eyebrow">Five-person internship group project, 2026</p>
+          <p class="eyebrow">Team lead, five-person internship group project, 2026</p>
           <div>
             <h3>SafeZone, community crisis response</h3>
             <ul class="bullet-list">
-              <li>Owned the shared API integration boundary and coordinated how independently developed serverless domains were exposed to the frontend, and integrated routing and responsive navigation into one coherent journey.</li>
-              <li>Was responsible for the static hosting and deployment workstream, and prepared the final interactive presentation covering architecture and verification.</li>
+              <li>Led the team over five weeks: set the goals and timeline, ran a weekly cadence, and coordinated scheduling and communication with managers and mentors through to the final presentation.</li>
+              <li>Owned the shared API integration boundary and coordinated how independently developed serverless domains were exposed to the frontend, and integrated every teammate's separately built pages into one working application with coherent routing and responsive navigation.</li>
+              <li>Stood up the static hosting and a deployment target early, so the team always had somewhere to deploy, and prepared the final interactive presentation covering architecture and verification.</li>
             </ul>
           </div>
         </article>
@@ -235,6 +240,7 @@
             <ul class="bullet-list">
               <li>Contributed architecture-feasibility analysis to a multilingual healthcare-intake kiosk concept, challenging an unsupported single-pipeline language and voice assumption and separating processing paths by confirmed service capability.</li>
               <li>Evaluated regional and cross-region data constraints and edge-compute trade-offs, and strengthened deterministic offline degradation and human-safety escalation paths.</li>
+              <li>Built an interactive simulation of the architecture showing how the concept responds to failures, which teammates adopted for their own presentations, and set up the team's shared tooling.</li>
             </ul>
           </div>
         </article>
@@ -269,11 +275,11 @@
           </section>
           <section class="skill-row">
             <div class="skill-heading"><h3>Databases</h3></div>
-            <p>SQLite, DynamoDB, TimescaleDB</p>
+            <p>SQLite, DynamoDB, TimescaleDB, Redis</p>
           </section>
           <section class="skill-row">
             <div class="skill-heading"><h3>Infrastructure and DevOps</h3></div>
-            <p>Docker, Kubernetes, Linux, system administration, networking, Git, GitLab, GitHub, CI/CD, Kustomize, Terraform, CDK and CloudFormation</p>
+            <p>Docker and container hardening, Kubernetes, Kustomize, Linux, system administration, networking, Bash, PowerShell, Git, GitLab, GitHub, GitHub Actions, CI/CD, cron, blue/green and rolling deployments, CDK and CloudFormation</p>
           </section>
           <section class="skill-row">
             <div class="skill-heading"><h3>Observability and reliability</h3></div>
@@ -281,11 +287,15 @@
           </section>
           <section class="skill-row">
             <div class="skill-heading"><h3>Cloud (AWS)</h3></div>
-            <p>Lambda, API Gateway, DynamoDB, S3, CloudFront, CloudWatch, EventBridge, SNS, CloudTrail, Config, VPC and Flow Logs, Cognito, IAM, CDK</p>
+            <p>CloudFormation, CodePipeline, CodeBuild and CodeDeploy, Elastic Beanstalk, ECS and EKS, Control Tower and Service Catalog, Lambda, API Gateway, DynamoDB, S3, CloudFront, Cognito, IAM, KMS, Bedrock, CDK</p>
           </section>
           <section class="skill-row">
             <div class="skill-heading"><h3>Cloud (Azure)</h3></div>
             <p>Azure Kubernetes Service, Azure Container Registry</p>
+          </section>
+          <section class="skill-row">
+            <div class="skill-heading"><h3>Coursework, hands-on</h3></div>
+            <p>From the degree's own lab work, kept separate from the project and employment claims above: OSPF and BGP routing, Terraform, Ansible, Jenkins, Prometheus, ELK, Fluentd, Wireshark, and AWS CloudWatch, EventBridge, SNS, CloudTrail, Config and VPC Flow Logs</p>
           </section>
         </div>
       </div>
