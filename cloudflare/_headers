@@ -1,5 +1,5 @@
 /*
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; frame-src https://challenges.cloudflare.com; img-src 'self' data:; object-src 'none'; script-src 'self' 'sha256-0hf+CP5pvSrgj75hbzQArLNXn4RyDQ04c+wilHQB5+s=' https://challenges.cloudflare.com; style-src 'self'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; frame-src https://challenges.cloudflare.com; img-src 'self' data:; object-src 'none'; script-src 'self' 'sha256-HqeOkmrVcJpmtGeukXSenfYh6mMdWZBtNj+RrurzEz4=' 'sha256-hspyeiP1U4WxhPJ+oTpg8skeWh38Dk8ik0ZL4pVE6uQ=' 'sha256-9ZgP9z0nMGgKJJmLhUSQRzSnaE7GW1ramFzyvFUfxaU=' 'sha256-7LxydXZXWimVofelo5JfjXKnk8881VtUfNqZame+Vqs=' 'sha256-w0IVv2zp82J1tTP4Tq15w1vRo98jF95p1qENyfgJFeA=' 'sha256-Jd6RrMhwA7nf/bZYEdFxP3yu7gfHzBB5q+gBgefnZc8=' 'sha256-6iYF6nwat2yOzfA47qAvdoBB7NV44ih0/g2RHbbiGwk=' 'sha256-pOtBRngJHEepanQltExOUwBEXbhKZA60rJdNpt86E90=' 'sha256-W1FNPJQbQM/lLAyOMdAppNMvlBVHEQ5O1uUjwlMdW+M=' 'sha256-GYuXr3qneR2La91bOTM3mizGlKPmdR8bLeJlLjKQAms=' 'sha256-W+nojiwOZIpc4yR78k3M7Cq82LjZyzoGvfrUAJwi4uI=' https://challenges.cloudflare.com; style-src 'self'; upgrade-insecure-requests
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
   Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
@@ -8,14 +8,92 @@
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
 
+# Pages. The live URLs are extensionless: html_handling is auto-trailing-slash
+# (wrangler.jsonc), so a browser asks for /about, not /about.html, and a
+# /*.html rule on its own matches none of them. Each served path is therefore
+# listed explicitly.
+#
+# Rules are additive - Workers applies every rule that matches and joins a
+# repeated header with a comma - so no two rules in this file may set
+# Cache-Control for the same URL. That rules out a /* or /:page catch-all: it
+# would overlap the asset rules below and emit two conflicting Cache-Control
+# values. A path not listed falls back to the platform default, which today is
+# the same value; stating it keeps it true if that default changes and when the
+# request carries Authorization or Range, where the default does not apply.
+#
+# max-age=0, must-revalidate: page content changes on every deploy while its
+# URL never does, so the browser has to ask each time. The answer is a 304 from
+# the ETag - one conditional request, no body.
 /
   Cache-Control: public, max-age=0, must-revalidate
 
+/about
+  Cache-Control: public, max-age=0, must-revalidate
+
+/experience
+  Cache-Control: public, max-age=0, must-revalidate
+
+/projects
+  Cache-Control: public, max-age=0, must-revalidate
+
+/contact
+  Cache-Control: public, max-age=0, must-revalidate
+
+/cv
+  Cache-Control: public, max-age=0, must-revalidate
+
+/404
+  Cache-Control: public, max-age=0, must-revalidate
+
+# The case studies, and anything else resolving under /work/.
+/work/*
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Direct .html hits, which auto-trailing-slash redirects to the paths above.
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
 
+# Runtime configuration read by script.js: never cached, so the contact
+# endpoint can be repointed without waiting for a cache to expire.
 /contact-config.js
   Cache-Control: no-store
 
-/assets/*
-  Cache-Control: public, max-age=2592000
+# style.css and script.js are NOT content-hashed - a deploy replaces the bytes
+# behind the same URL. Any positive max-age here can hand fresh HTML to a
+# browser holding the old stylesheet and visibly break the page for whoever is
+# reading it, so these revalidate instead of taking the year a hashed asset
+# would deserve. Cost: one conditional request each, answered 304 from the ETag
+# on the connection that just fetched the page.
+/style.css
+  Cache-Control: public, max-age=0, must-revalidate
+
+/script.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Fonts: fixed upstream IBM Plex subsets, named by family and weight. The bytes
+# behind these names do not change, so a year with immutable - a returning
+# visitor revalidates them never.
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images and licence text. Listed one by one because an /assets/* glob is
+# greedy and would also match the fonts above, duplicating Cache-Control. These
+# are content-stable, but a screenshot or the OG card can be redrawn under the
+# same name, so 30 days rather than a year: immutable means no revalidation
+# inside the window, and a replacement still reaches returning visitors within
+# a month. A new file added to the build allowlist and not listed here just
+# falls back to the revalidating default - slower, never stale.
+/assets/king-meal-prep.webp
+  Cache-Control: public, max-age=2592000, immutable
+
+/assets/og-card.png
+  Cache-Control: public, max-age=2592000, immutable
+
+/assets/recsbot-interface.webp
+  Cache-Control: public, max-age=2592000, immutable
+
+/assets/vedetta-interface.webp
+  Cache-Control: public, max-age=2592000, immutable
+
+/assets/LUCIDE-LICENSE.txt
+  Cache-Control: public, max-age=2592000, immutable
