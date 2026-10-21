@@ -23,9 +23,12 @@ For a static preview:
 python3 -m http.server 8080
 ```
 
-Open <http://127.0.0.1:8080>. A plain static server has no `/api/contact`
-route, so the contact form reports that the message could not be sent; use
-the local contact service below for a working form.
+Open <http://127.0.0.1:8080>. Two caveats. The site is published at clean
+URLs (`/about`, not `/about.html`) and every internal link is written that
+way, which a plain static server cannot resolve, so navigation 404s; the
+local contact service below maps them the way Cloudflare does. A plain
+static server also has no `/api/contact` route, so the contact form reports
+that the message could not be sent.
 
 For the optional same-origin local contact service:
 
@@ -33,9 +36,11 @@ For the optional same-origin local contact service:
 python3 local_server.py
 ```
 
-The service stores validated submissions in the ignored
-`runtime/contacts.db`, applies per-client rate limits, and expires records
-after 90 days by default.
+It serves clean URLs, stores validated submissions in the ignored
+`runtime/contacts.db`, applies its own per-client rate limits, and expires
+records after 90 days by default. Production rate limiting is separate and
+enforced in the Worker: five requests per minute per client IP per
+Cloudflare location, failing open if the binding is unavailable.
 
 ## Structure
 

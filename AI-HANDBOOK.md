@@ -9,7 +9,12 @@ provider-free local contact service. Content was refreshed from the NAS
 career briefings, the canonical targeted-CV facts, and the LinkedIn audit
 through 11 September 2026, and realigned on 20 October 2026 to the canonical
 CV README and the master CV rebuilt from it on 15 October 2026 - which is the
-source of truth whenever this file or a page disagrees with it.
+source of truth whenever this file or a page disagrees with it. A defect pass
+on 21-22 October 2026 fixed the fake SemiBold face, converted every internal
+link to its clean URL, gave each page its own structured data, associated the
+contact form's errors with their fields, added rate limiting to the contact
+endpoint, and raised non-text contrast to the 3:1 floor. See Operational
+Invariants below for what must not be undone.
 
 The public pages are:
 
@@ -122,6 +127,33 @@ The public pages are:
   adapters, an implemented AI worker, or authentication in the web interface -
   it has none by design.
 
+- **He lives in Italy and is targeting the Irish market. Write both, never
+  swap one for the other.** The site may say he is based in Italy, moving to
+  Ireland, holds an Irish degree (Dundalk Institute of Technology, NFQ Level
+  7) and as an EU citizen needs no work permit there. It must never state or
+  imply that he currently lives or is based in Ireland: that is the one claim
+  on this site a recruiter disproves on the first call, and it would undo the
+  credibility every other boundary in this file protects. The UK remains a
+  secondary target, where an employer provides visa sponsorship.
+- The primary job title is **"Cloud and platform engineer"**, used in every
+  `<title>`, the home page hero and the JSON-LD `jobTitle`. "Solutions
+  engineer" was retired from the hero on 21 October 2026: no role or
+  attestation supports it, and `contact.html` already lists solutions
+  architecture and presales among the roles he is interested in, which is the
+  honest place for them. Do not promote an interest into a title.
+- Skills lists must keep coursework visibly separate from work that has a role
+  bullet, a case study or a named project behind it - `cv.html` does this with
+  a "Coursework, hands-on" row and `about.html` with an explicit "From the
+  degree's lab work" clause. On 21 October 2026 the three `about.html` lists
+  were cut back to items with that backing; EC2, VPC, Windows Server, Type 1
+  hypervisors, canary releases, MPLS, QoS, SNMP, spanning tree and PAT came
+  off because nothing on the site evidenced them. A technology named nowhere
+  else on the site does not belong in a skills list.
+- The SafeZone leadership caveat - "A team lead among peers, not a people
+  manager." - travels with the claim on all three pages that make it
+  (`experience.html`, `projects.html`, `cv.html`). SafeZone's hosting is
+  "static hosting", never named services.
+
 ## Visual Assets
 
 `assets/king-meal-prep.webp`, `assets/recsbot-interface.webp` and
@@ -176,12 +208,22 @@ rows (`--paper-2`), a blue-black ink in three weights (`--ink`, `--ink-2`,
 links, the current page and focus. No dark ground, no fluorescent accent, no
 shadows, blurs or gradients - those read as a generated template.
 
-Type: IBM Plex Sans for text and headings (400 and 600 only), IBM Plex Mono for
+Type: IBM Plex Sans for text and headings, IBM Plex Mono for
 data - dates, counts, record labels, field names - always with
 `font-variant-numeric: tabular-nums` so columns align. Both are self-hosted in
 `assets/fonts/` under the OFL and subset to the characters the site uses, which
-is why they are about 65 KB in total; regenerate with `fontTools.subset` if a
-character is missing. Headings stay at document sizes: the largest is under
+is why they are about 37 KB in total; regenerate with `fontTools.subset` if a
+character is missing. **Only the 400 faces are bundled. `font-weight: 600` is
+produced by the browser's own bold synthesis, and must stay that way unless a
+genuine SemiBold subset is added.** Until 21 October 2026 a file named
+`plex-sans-600.woff2` was a byte-identical copy of the Regular, declared at
+`font-weight: 600`. Declaring a weight promises the browser that face exists,
+so synthesis was switched off and every heading, `<strong>`, button and active
+nav item rendered at Regular on all 12 pages. Never declare a `@font-face`
+whose file does not carry the weight it claims;
+`test_bundled_fonts_are_distinct_and_declared` now fails the build if two
+declared weights resolve to one file, or if any two font files are
+byte-identical. Headings stay at document sizes: the largest is under
 3rem. Never set a page in one giant display face.
 
 Layout: a label column (`--label`) holds the section label, dates or record
@@ -195,10 +237,63 @@ Motion: none beyond state feedback on hover and focus, all of it listed
 property by property, never `transition: all`. `prefers-reduced-motion` is
 honoured. A print stylesheet drops the chrome so the pages print as sheets.
 
-Quality floor for any change: contrast at least 4.5:1 (currently 4.52 and
-above), a visible focus ring, a layout that holds from 375px to 1920px,
+Quality floor for any change: text contrast at least 4.5:1 (currently 4.52
+and above - `--ink-3` on `--paper-2` clears it by 0.02, so `--paper-2` must
+not be darkened), non-text contrast at least 3:1 on the visual boundary of
+anything interactive, which is what `--control-edge` (#828b95, 3.46:1 on
+`--paper` and 3.19:1 on `--paper-2`) exists for. Use it for borders on inputs,
+buttons and controls; `--rule` and `--rule-2` are decorative and exempt. Also
+a visible focus ring, a layout that holds from 375px to 1920px,
 `[hidden]` still beating the layout rules so the project filter works, and
 Lighthouse at 100 for accessibility, best practices and SEO.
+
+## Operational Invariants
+
+These four are non-obvious, easy to break, and each one has already cost
+something. Read them before editing the pages, the headers or the worker.
+
+**Clean URLs are the required link form.** `wrangler.jsonc` sets
+`html_handling: auto-trailing-slash`, so the live site serves `/about` from
+`about.html` and `/` from `index.html`. Every internal link must be written
+root-relative and extensionless - `/about`, `/work/vedetta`, `/` - never
+`/about.html`. A `.html` href costs a redirect before the next page loads and
+hands crawlers a redirect where the canonical URL belongs; 180 of them shipped
+until 21 October 2026. `test_internal_links_use_the_clean_url` enforces it,
+and `local_server.py` maps clean URLs the way Cloudflare does so the preview
+still works. A plain `python3 -m http.server` does not, and cannot follow the
+navigation.
+
+**The CSP carries one script hash per page, not one for the site.** `script-src`
+has no `'unsafe-inline'`, so each page's inline JSON-LD is allowed only by its
+own `sha256-`. Since the structured data became per-page there are 11 hashes
+listed in `cloudflare/_headers`. Changing any page's JSON-LD by even one byte
+means regenerating that page's hash, which is what
+`python3 scripts/refresh-csp-hashes.py` is for;
+`test_structured_data_matches_the_content_security_policy` fails the build
+when they fall out of step, and `test_structured_data_is_valid` separately
+rejects an unknown `@type` or a dangling `@id`.
+
+**Header rules in `cloudflare/_headers` merge, and duplicates are joined with a
+comma.** A URL matching two rules receives both, so
+`Cache-Control: ...max-age=0...` and `...max-age=31536000...` would be emitted
+together and neither would mean anything. No two rules may set `Cache-Control`
+for the same URL, which is why each served path is listed explicitly instead
+of using a `/*` catch-all. Fonts get a year with `immutable`; images and the
+OG card get 30 days; `style.css` and `script.js` deliberately revalidate
+because their filenames are **not** content-hashed, so any positive max-age
+could hand fresh HTML to a browser still holding the old stylesheet.
+
+**The contact endpoint is rate limited, and it fails open.** `wrangler.jsonc`
+declares a top-level `ratelimits` binding (`CONTACT_RATE_LIMIT`, namespace
+1001): five requests per 60 seconds, keyed on `CF-Connecting-IP`, with one
+shared bucket when the header is absent. Over the limit returns 429 with
+`Retry-After`. If the binding is missing or throws, the request is allowed
+through and a code is logged - deliberate, because a silently refused message
+on a job-seeker's only contact route is worse than an extra one getting
+through, and Turnstile still verifies unconditionally and still fails closed.
+Platform limit worth knowing: `period` accepts only 10 or 60, so a per-hour or
+per-day quota is not achievable with this binding and would need KV or a
+Durable Object. Requires Wrangler 4.36.0 or later.
 
 ## Contact Modes
 
