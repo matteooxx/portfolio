@@ -13,13 +13,10 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: "Plex Sans";
-  src: url("assets/fonts/plex-sans-600.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
+/* Only the Regular face is bundled, so font-weight: 600 is left to the
+ * browser's own bold synthesis. Do not declare a 600 @font-face that points at
+ * the Regular file: declaring the weight suppresses synthesis and flattens
+ * every heading, <strong> and button back to Regular. */
 
 @font-face {
   font-family: "Plex Mono";
@@ -39,6 +36,12 @@
   --ink-3: #68727c;
   --rule: #dbdfe4;
   --rule-2: #aeb6bf;
+  /* The visible edge of a control the user can operate: inputs, buttons,
+   * segmented controls. WCAG 2.2 SC 1.4.11 wants 3:1 against the adjacent
+   * surface, which --rule-2 (2.05:1 on --paper) does not reach. This clears it
+   * on both grounds: 3.46:1 on --paper, 3.19:1 on --paper-2. --rule and
+   * --rule-2 stay light because they only draw dividers, which are exempt. */
+  --control-edge: #828b95;
   --accent: #1d3fbf;
   --accent-2: #142c88;
   --accent-wash: #eef1fb;
@@ -269,7 +272,7 @@ textarea {
   width: 2.3rem;
   height: 2.3rem;
   background: var(--paper);
-  border: 1px solid var(--rule-2);
+  border: 1px solid var(--control-edge);
   color: var(--ink);
   cursor: pointer;
   transition: background-color 140ms ease, border-color 140ms ease;
@@ -296,6 +299,8 @@ textarea {
   border-top: 1px solid var(--rule);
 }
 
+/* .section-dark is a misnomer: it is the same muted paper as .section-muted.
+ * Both names are in the markup; they are aliases, not two tones. */
 .section-muted,
 .section-dark {
   background: var(--paper-2);
@@ -354,6 +359,8 @@ textarea {
   letter-spacing: 0.02em;
 }
 
+/* Another all-light holdover: same ink as .eyebrow, kept because the markup
+ * uses it. No "light" variant exists to contrast with. */
 .eyebrow-light {
   color: var(--ink-3);
 }
@@ -394,18 +401,6 @@ textarea {
   gap: 0.4rem;
   margin: 0.15rem 0 0;
   font-size: var(--text-s);
-}
-
-.hero-media,
-.hero-scrim {
-  display: none;
-}
-
-.hero-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--ink-3);
 }
 
 .status-dot {
@@ -514,7 +509,7 @@ textarea {
 .button-ghost {
   background: var(--paper);
   color: var(--ink);
-  border-color: var(--rule-2);
+  border-color: var(--control-edge);
 }
 
 .button-light:hover,
@@ -555,6 +550,11 @@ textarea {
   border-bottom: 1px solid var(--ink);
 }
 
+/* Misnomers kept for the markup's sake: the palette went all-light, so -dark,
+ * -green and -blue all resolve to plain paper and this rule is a no-op (a
+ * .page-intro with no variant, as on cv.html, renders identically). Renaming
+ * would touch five pages for no visual change, so the names stay and this
+ * comment carries the truth. Do not reintroduce a tinted intro. */
 .page-intro-dark,
 .page-intro-green,
 .page-intro-blue {
@@ -634,12 +634,6 @@ textarea {
   font-size: var(--text-s);
 }
 
-.applied-number {
-  font-family: var(--mono);
-  font-size: 0.78rem;
-  color: var(--ink-3);
-}
-
 .skill-heading {
   display: flex;
   align-items: baseline;
@@ -679,7 +673,7 @@ textarea {
 .project-image-link {
   position: relative;
   display: block;
-  border: 1px solid var(--rule-2);
+  border: 1px solid var(--control-edge);
   background: var(--paper-2);
   overflow: hidden;
 }
@@ -700,7 +694,7 @@ textarea {
   width: 2rem;
   height: 2rem;
   background: var(--paper);
-  border: 1px solid var(--rule-2);
+  border: 1px solid var(--control-edge);
   color: var(--ink);
 }
 
@@ -1057,14 +1051,14 @@ textarea {
 .segmented-control {
   display: flex;
   flex-wrap: wrap;
-  border: 1px solid var(--rule-2);
+  border: 1px solid var(--control-edge);
 }
 
 .segmented-control button {
   padding: 0.45rem 0.9rem;
   background: var(--paper);
   border: 0;
-  border-left: 1px solid var(--rule-2);
+  border-left: 1px solid var(--control-edge);
   color: var(--ink-2);
   font-size: var(--text-s);
   cursor: pointer;
@@ -1289,7 +1283,7 @@ textarea {
   width: 100%;
   padding: 0.6rem 0.7rem;
   background: var(--paper);
-  border: 1px solid var(--rule-2);
+  border: 1px solid var(--control-edge);
   color: var(--ink);
   transition: border-color 140ms ease, background-color 140ms ease;
 }
@@ -1411,10 +1405,6 @@ textarea {
   font-family: var(--mono);
   font-size: 0.76rem;
   color: var(--ink-3);
-}
-
-.reveal {
-  opacity: 1;
 }
 
 /* CV: one project is a labelled row, like every other record on the site. */

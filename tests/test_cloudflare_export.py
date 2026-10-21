@@ -38,7 +38,6 @@ PUBLIC_FILES = {
     "assets/fonts/OFL-IBM-Plex.txt",
     "assets/fonts/plex-mono-400.woff2",
     "assets/fonts/plex-sans-400.woff2",
-    "assets/fonts/plex-sans-600.woff2",
     "assets/king-meal-prep.webp",
     "assets/og-card.png",
     "assets/recsbot-interface.webp",
