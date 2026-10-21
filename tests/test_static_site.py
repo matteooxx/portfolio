@@ -51,10 +51,30 @@ def webp_size(path: Path) -> tuple[int, int]:
     raise AssertionError(f"{path.name} is not a VP8 or VP8L WebP file")
 
 
+def served_file(reference: str) -> Path | None:
+    """Map a served URL back to the file Cloudflare answers it with.
+
+    wrangler.jsonc sets html_handling to auto-trailing-slash, so the live site
+    serves /about from about.html and / from index.html. Looking for a file
+    literally named "about" would let every typo in a clean URL through.
+    """
+    path = urlsplit(reference).path.lstrip("/")
+    if not path:
+        return ROOT / "index.html"
+    direct = ROOT / path
+    if direct.is_file():
+        return direct
+    extended = ROOT / f"{path}.html"
+    if extended.is_file():
+        return extended
+    return None
+
+
 class ReferenceParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.references: list[str] = []
+        self.ids: set[str] = set()
         self.title_parts: list[str] = []
         self.in_title = False
 
@@ -66,6 +86,9 @@ class ReferenceParser(HTMLParser):
             value = values.get(key)
             if value:
                 self.references.append(value)
+        element_id = values.get("id")
+        if element_id:
+            self.ids.add(element_id)
         if tag == "title":
             self.in_title = True
 
@@ -87,12 +110,19 @@ class StaticSiteTests(unittest.TestCase):
 
             for reference in parser.references:
                 parsed = urlsplit(reference)
-                if parsed.scheme or reference.startswith(("#", "/")):
+                if parsed.scheme:
                     continue
-                target = ROOT / parsed.path
-                self.assertTrue(
-                    target.is_file(),
-                    f"{page_name} references missing file {parsed.path}",
+                if not parsed.path:
+                    # A same-page anchor: the target id has to exist.
+                    self.assertIn(
+                        parsed.fragment,
+                        parser.ids,
+                        f"{page_name} links to missing anchor #{parsed.fragment}",
+                    )
+                    continue
+                self.assertIsNotNone(
+                    served_file(reference),
+                    f"{page_name} references missing target {reference}",
                 )
 
     def test_the_not_found_page_is_depth_independent(self) -> None:
@@ -110,9 +140,9 @@ class StaticSiteTests(unittest.TestCase):
                 reference.startswith("/"),
                 f"404.html reference {reference} breaks below the site root",
             )
-            self.assertTrue(
-                (ROOT / reference.lstrip("/")).is_file(),
-                f"404.html references missing file {reference}",
+            self.assertIsNotNone(
+                served_file(reference),
+                f"404.html references missing target {reference}",
             )
 
     def test_stale_public_claims_are_absent(self) -> None:
@@ -149,6 +179,14 @@ class StaticSiteTests(unittest.TestCase):
             "coursework complete",
             "(Hons)",
             "Honours",
+            # He lives in Italy and targets the Irish market. The site may
+            # say he is moving to Ireland, studied there and needs no work
+            # permit there; it may never say he is based there. That is the
+            # one claim here a recruiter disproves on the first call.
+            "based in Ireland",
+            "Based in Ireland",
+            "based in Dublin",
+            "Based in Dublin",
             # The operator's own estimate, never confirmed by the employer,
             # retired from the site on 20 October 2026.
             "30%",
@@ -364,6 +402,276 @@ class StaticSiteTests(unittest.TestCase):
         self.assertNotIn(public_cv_name, html.casefold())
         self.assertFalse((ROOT / public_cv_name).exists())
         self.assertIsNone(re.search(r"\+\d[\d\s().-]{7,}\d", html))
+
+    def test_internal_links_use_the_clean_url(self) -> None:
+        # html_handling is auto-trailing-slash, so Cloudflare redirects
+        # /about.html to /about. A .html href therefore spends a round trip
+        # before the next page starts loading, and hands a crawler a redirect
+        # where the canonical URL was meant to be. 180 of them shipped once.
+        for page_name in PAGES:
+            parser = ReferenceParser()
+            parser.feed((ROOT / page_name).read_text(encoding="utf-8"))
+            for reference in parser.references:
+                parsed = urlsplit(reference)
+                if parsed.scheme:
+                    continue
+                self.assertFalse(
+                    parsed.path.endswith(".html"),
+                    f"{page_name} links to {reference}, not its clean URL",
+                )
+
+    def test_bundled_fonts_are_distinct_and_declared(self) -> None:
+        # plex-sans-600.woff2 was once a byte-identical copy of the 400 file
+        # declared at font-weight: 600. Declaring a weight promises the face
+        # exists, so the browser switched off bold synthesis and every
+        # heading, <strong> and button rendered at Regular on all 12 pages.
+        # Two declared weights may never share one file again.
+        css = (ROOT / "style.css").read_text(encoding="utf-8")
+        faces = re.findall(r"@font-face\s*\{(.*?)\}", css, re.DOTALL)
+        self.assertTrue(faces, "no @font-face block found")
+
+        declared: dict[tuple[str, str], Path] = {}
+        for block in faces:
+            source = re.search(r'src:\s*url\("([^"]+)"\)', block)
+            weight = re.search(r"font-weight:\s*(\d+)", block)
+            family = re.search(r'font-family:\s*"([^"]+)"', block)
+            self.assertIsNotNone(source, f"@font-face with no src: {block[:60]}")
+            self.assertIsNotNone(weight, f"@font-face with no weight: {block[:60]}")
+            self.assertIsNotNone(family, f"@font-face with no family: {block[:60]}")
+            target = ROOT / source.group(1)
+            self.assertTrue(target.is_file(), f"missing font file {source.group(1)}")
+            key = (family.group(1), weight.group(1))
+            self.assertNotIn(key, declared, f"{key} declared twice")
+            declared[key] = target
+
+        seen: dict[str, str] = {}
+        for path in sorted((ROOT / "assets/fonts").glob("*.woff2")):
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            self.assertNotIn(
+                digest,
+                seen,
+                f"{path.name} is byte-identical to {seen.get(digest)}",
+            )
+            seen[digest] = path.name
+
+        self.assertEqual(
+            len({path.resolve() for path in declared.values()}),
+            len(declared),
+            "two declared weights resolve to the same file",
+        )
+
+    def test_the_project_count_and_filters_match_the_markup(self) -> None:
+        # The page shipped "9 projects" over 10 cards, on the one page that
+        # states no metric is invented, and script.js only corrects the label
+        # after the first filter click. Four cards also carried an
+        # "infrastructure" category that no button could select.
+        html = (ROOT / "projects.html").read_text(encoding="utf-8")
+        cards = re.findall(r'data-project-card[^>]*data-category="([^"]*)"', html)
+        self.assertTrue(cards, "no project cards found")
+
+        label = re.search(r'id="projectCount"[^>]*>([^<]+)<', html)
+        self.assertIsNotNone(label, "no projectCount label")
+        self.assertEqual(
+            label.group(1).strip(),
+            f"{len(cards)} projects",
+            "the pre-script label disagrees with the number of cards",
+        )
+
+        buttons = set(re.findall(r'data-project-filter="([^"]+)"', html))
+        tokens = {token for card in cards for token in card.split()}
+        self.assertFalse(
+            tokens - buttons,
+            f"card categories no button can select: {sorted(tokens - buttons)}",
+        )
+        for button in buttons - {"all"}:
+            self.assertTrue(
+                any(button in card.split() for card in cards),
+                f"filter {button} selects nothing",
+            )
+
+    def test_every_page_is_well_formed(self) -> None:
+        # test_each_page_is_a_single_document counts elements with regexes and
+        # html.parser never raises, so an unclosed <div> shipped silently.
+        # This is nesting well-formedness, not W3C spec conformance: no
+        # validator is available without Java or a new dependency.
+        void = {
+            "area", "base", "br", "col", "embed", "hr", "img", "input",
+            "link", "meta", "source", "track", "wbr",
+        }
+
+        class NestingParser(HTMLParser):
+            def __init__(self) -> None:
+                super().__init__()
+                self.stack: list[str] = []
+                self.problems: list[str] = []
+
+            def handle_starttag(self, tag, attrs) -> None:
+                if tag not in void:
+                    self.stack.append(tag)
+
+            def handle_endtag(self, tag) -> None:
+                if tag in void:
+                    return
+                if not self.stack:
+                    self.problems.append(f"stray </{tag}>")
+                elif self.stack[-1] != tag:
+                    self.problems.append(f"</{tag}> closes <{self.stack[-1]}>")
+                    if tag in self.stack:
+                        while self.stack and self.stack.pop() != tag:
+                            pass
+                else:
+                    self.stack.pop()
+
+        for page_name in PAGES:
+            parser = NestingParser()
+            parser.feed((ROOT / page_name).read_text(encoding="utf-8"))
+            self.assertEqual(parser.problems, [], page_name)
+            self.assertEqual(
+                parser.stack, [], f"{page_name} leaves {parser.stack} unclosed"
+            )
+
+    def test_structured_data_is_valid(self) -> None:
+        # The JSON-LD went from one shared block to a distinct block per page,
+        # so a typo in a type or a dangling @id now breaks one page only and
+        # silently drops that page's entity. The CSP hash test proves the
+        # bytes match the policy; this proves the data means something.
+        allowed_types = {
+            "AboutPage", "BreadcrumbList", "CollectionPage",
+            "CollegeOrUniversity", "ContactPage", "Country", "CreativeWork",
+            "EducationalOccupationalCredential", "ItemList", "Language",
+            "ListItem", "Organization", "Person", "Place", "ProfilePage",
+            "SoftwareSourceCode", "TechArticle", "WebPage", "WebSite",
+        }
+        block_pattern = re.compile(
+            r'<script type="application/ld\+json">(.*?)</script>', re.DOTALL
+        )
+
+        def walk(node, types, refs, defined):
+            if isinstance(node, dict):
+                kind = node.get("@type")
+                for value in kind if isinstance(kind, list) else [kind]:
+                    if value is not None:
+                        types.add(value)
+                identifier = node.get("@id")
+                if identifier and kind is not None:
+                    defined.add(identifier)
+                elif identifier:
+                    refs.add(identifier)
+                for key, value in node.items():
+                    if key not in ("@type", "@id", "@context"):
+                        self.assertNotIn(value, ("", []), f"empty value for {key}")
+                    walk(value, types, refs, defined)
+            elif isinstance(node, list):
+                for value in node:
+                    walk(value, types, refs, defined)
+
+        for page_name in PAGES:
+            html = (ROOT / page_name).read_text(encoding="utf-8")
+            blocks = block_pattern.findall(html)
+            if page_name == "404.html":
+                self.assertEqual(blocks, [], "the 404 page carries no metadata")
+                continue
+            self.assertEqual(len(blocks), 1, page_name)
+
+            data = json.loads(blocks[0])
+            self.assertEqual(data["@context"], "https://schema.org")
+
+            types, refs, defined = set(), set(), set()
+            walk(data, types, refs, defined)
+
+            self.assertFalse(
+                types - allowed_types,
+                f"{page_name} uses unknown types {sorted(types - allowed_types)}",
+            )
+            self.assertFalse(
+                refs - defined,
+                f"{page_name} has dangling @id {sorted(refs - defined)}",
+            )
+
+            for node in data.get("@graph", []):
+                if node.get("@type") == "BreadcrumbList":
+                    positions = [
+                        item["position"] for item in node["itemListElement"]
+                    ]
+                    self.assertEqual(
+                        positions,
+                        list(range(1, len(positions) + 1)),
+                        f"{page_name} breadcrumb positions are not 1..n",
+                    )
+                if node.get("@type") == "CollectionPage":
+                    listing = node.get("mainEntity", {})
+                    if listing.get("@type") == "ItemList":
+                        self.assertEqual(
+                            listing["numberOfItems"],
+                            len(listing["itemListElement"]),
+                            f"{page_name} numberOfItems disagrees with the list",
+                        )
+
+    def test_published_assets_stay_within_budget(self) -> None:
+        # Nothing performance-related runs in CI: the browser skills are all
+        # interactive and human-started. These ceilings are the October 2026
+        # sizes with roughly a quarter of headroom, so an asset that balloons
+        # fails the build. Raise a number here deliberately; do not delete it.
+        budget = {
+            "style.css": 36_000,
+            "script.js": 14_000,
+            "assets/og-card.png": 20_000,
+            "assets/king-meal-prep.webp": 34_000,
+            "assets/recsbot-interface.webp": 30_000,
+            "assets/vedetta-interface.webp": 28_000,
+            "assets/fonts/plex-sans-400.woff2": 36_000,
+            "assets/fonts/plex-mono-400.woff2": 10_000,
+        }
+        for name, ceiling in budget.items():
+            size = (ROOT / name).stat().st_size
+            self.assertLessEqual(
+                size, ceiling, f"{name} is {size} bytes, over its {ceiling} budget"
+            )
+
+    def test_the_page_lists_agree_with_each_other(self) -> None:
+        # The publishable file list is written out four times: PUBLIC_FILES in
+        # the build script, its mirror in test_cloudflare_export, PAGES here,
+        # and sitemap.xml. A page added to three of the four fails silently -
+        # missing from the deploy or from the sitemap, with green tests.
+        try:
+            from test_cloudflare_export import PUBLIC_FILES as mirrored
+        except ModuleNotFoundError:  # pragma: no cover - direct runs
+            from tests.test_cloudflare_export import PUBLIC_FILES as mirrored
+
+        script = (ROOT / "scripts/build-cloudflare-pages.sh").read_text(
+            encoding="utf-8"
+        )
+        block = re.search(r"PUBLIC_FILES=\((.*?)\n\)", script, re.DOTALL)
+        self.assertIsNotNone(block, "no PUBLIC_FILES array in the build script")
+        allowlisted = {
+            line.strip()
+            for line in block.group(1).splitlines()
+            if line.strip() and not line.strip().startswith("#")
+        }
+
+        # _headers is not in the array: the script installs it from
+        # cloudflare/_headers to the output root and appends the bare name to
+        # the manifest it diffs the build against, so add it here too.
+        self.assertEqual(
+            allowlisted | {"_headers"},
+            set(mirrored),
+            "the build allowlist and its test mirror have drifted",
+        )
+        for page_name in PAGES:
+            self.assertIn(
+                page_name, allowlisted, f"{page_name} would not be deployed"
+            )
+
+        sitemap = (ROOT / "sitemap.xml").read_text(encoding="utf-8")
+        listed = {
+            served_file(url.removeprefix("https://matteomastore.com"))
+            for url in re.findall(r"<loc>([^<]+)</loc>", sitemap)
+        }
+        self.assertEqual(
+            listed,
+            {ROOT / page for page in PAGES if page != "404.html"},
+            "sitemap.xml and the indexable page list have drifted",
+        )
 
 
 if __name__ == "__main__":

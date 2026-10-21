@@ -23,6 +23,10 @@ jobs:
           node-version: "22"
       # JavaScript syntax, required assets, local contact service, static page
       # references, claim boundaries, Cloudflare export allowlist, and the
-      # public phone/CV privacy boundary. Nothing is deployed.
+      # public phone/CV privacy boundary. Also, since October 2026: clean-URL
+      # links and their targets, font files declared and distinct, HTML
+      # nesting, structured-data validity, derived counts on the projects
+      # page, asset byte budgets, and agreement between the four page lists.
+      # Nothing is deployed.
       - name: Run checks
         run: make check

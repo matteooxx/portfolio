@@ -122,6 +122,22 @@ class PortfolioHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
+    def translate_path(self, path: str) -> str:
+        """Resolve a clean URL to its .html file, as Cloudflare does.
+
+        wrangler.jsonc sets html_handling to auto-trailing-slash, so the live
+        site serves /about from about.html and every internal link is written
+        that way. SimpleHTTPRequestHandler has no such mapping, so without
+        this the preview 404s on every link in the navigation.
+        """
+        resolved = super().translate_path(path)
+        candidate = Path(resolved)
+        if not candidate.exists():
+            extended = candidate.with_name(candidate.name + ".html")
+            if extended.is_file():
+                return str(extended)
+        return resolved
+
     def end_headers(self) -> None:
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
