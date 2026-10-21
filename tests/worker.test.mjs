@@ -25,7 +25,14 @@ afterEach(() => {
 
 function makeEnv(overrides = {}) {
   const sent = [];
+  const limitCalls = [];
   const env = {
+    CONTACT_RATE_LIMIT: {
+      async limit(options) {
+        limitCalls.push(options);
+        return { success: true };
+      },
+    },
     TURNSTILE_SECRET_KEY: "test-secret",
     TURNSTILE_HOSTNAMES: "matteomastore.com",
     ALLOWED_ORIGINS: "https://matteomastore.com",
@@ -44,7 +51,7 @@ function makeEnv(overrides = {}) {
     },
     ...overrides,
   };
-  return { env, sent };
+  return { env, sent, limitCalls };
 }
 
 function contactRequest(body, headers = {}) {
@@ -244,4 +251,88 @@ test("hands non-API paths to the asset server and 404s unknown API paths", async
 
   const unknown = await worker.fetch(new Request("https://matteomastore.com/api/other"), env);
   assert.equal(unknown.status, 404);
+});
+
+test("passes a submission that is under the rate limit", async () => {
+  stubSiteverify(PASS);
+  const { env, sent, limitCalls } = makeEnv();
+
+  const response = await worker.fetch(contactRequest(VALID), env);
+
+  assert.equal(response.status, 200);
+  assert.equal(sent.length, 1);
+  assert.deepEqual(limitCalls, [{ key: "contact:203.0.113.7" }]);
+});
+
+test("rejects a submission over the rate limit before calling siteverify", async () => {
+  const calls = stubSiteverify(PASS);
+  const { env, sent } = makeEnv({
+    CONTACT_RATE_LIMIT: {
+      async limit() {
+        return { success: false };
+      },
+    },
+  });
+
+  const response = await worker.fetch(contactRequest(VALID), env);
+
+  assert.equal(response.status, 429);
+  assert.equal(response.headers.get("Retry-After"), "60");
+  assert.deepEqual(await response.json(), { error: "rate_limited" });
+  assert.equal(calls.length, 0);
+  assert.equal(sent.length, 0);
+});
+
+test("keys the rate limit on the client IP and shares one bucket without it", async () => {
+  stubSiteverify(PASS);
+  const { env, limitCalls } = makeEnv();
+
+  await worker.fetch(contactRequest(VALID, { "CF-Connecting-IP": "198.51.100.9" }), env);
+  await worker.fetch(
+    new Request("https://matteomastore.com/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "https://matteomastore.com",
+      },
+      body: JSON.stringify(VALID),
+    }),
+    env,
+  );
+
+  assert.deepEqual(limitCalls, [
+    { key: "contact:198.51.100.9" },
+    { key: "contact:unknown" },
+  ]);
+});
+
+test("fails open when the rate limit binding is missing or throws", async () => {
+  for (const override of [
+    { CONTACT_RATE_LIMIT: undefined },
+    {
+      CONTACT_RATE_LIMIT: {
+        async limit() {
+          const error = new Error("boom");
+          error.code = "E_LIMITER_UNAVAILABLE";
+          throw error;
+        },
+      },
+    },
+  ]) {
+    stubSiteverify(PASS);
+    const { env, sent } = makeEnv(override);
+    const originalError = console.error;
+    const logged = [];
+    console.error = (...args) => logged.push(args.join(" "));
+    try {
+      const response = await worker.fetch(contactRequest(VALID), env);
+      assert.equal(response.status, 200);
+      assert.equal(sent.length, 1);
+    } finally {
+      console.error = originalError;
+    }
+    // The failure is logged once, with no key, IP or address in the message.
+    assert.equal(logged.length, 1);
+    assert.doesNotMatch(logged[0], /203\.0\.113\.7|example\.com/);
+  }
 });

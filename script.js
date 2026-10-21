@@ -211,6 +211,17 @@
         return;
       }
 
+      if (response.status === 429) {
+        setStatus(
+          status,
+          "Too many messages just now. Wait a minute and try again, or email " +
+            CONTACT_EMAIL +
+            " directly.",
+          "error"
+        );
+        return;
+      }
+
       setStatus(status, SEND_FAILED_MESSAGE, "error");
     } catch (_error) {
       setStatus(status, SEND_FAILED_MESSAGE, "error");

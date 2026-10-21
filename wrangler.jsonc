@@ -25,6 +25,24 @@
     "CONTACT_FROM": "contact@matteomastore.com",
     "CONTACT_TO": "matteo.mastore.job@gmail.com"
   },
+  // Rate limiting for POST /api/contact, the only gate in front of the
+  // send_email quota other than Turnstile. This binding needs nothing
+  // provisioned in the dashboard: namespace_id is just a positive integer that
+  // has to be unique inside this account, so a plain `git push` deploy still
+  // needs zero manual setup. Keep 1001 reserved for the contact form if
+  // another limiter is ever added - bindings that share a namespace_id share
+  // counters. Needs Wrangler 4.36.0 or newer; "period" accepts only 10 or 60.
+  // The worker fails open if the binding is missing, see withinRateLimit().
+  "ratelimits": [
+    {
+      "name": "CONTACT_RATE_LIMIT",
+      "namespace_id": "1001",
+      "simple": {
+        "limit": 5,
+        "period": 60
+      }
+    }
+  ],
   "send_email": [
     {
       "name": "CONTACT_EMAIL",
