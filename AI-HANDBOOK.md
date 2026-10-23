@@ -82,6 +82,12 @@ The public pages are:
   latency, cost, availability, customer, or business-impact metrics.
 - Training and exam preparation are not earned certifications. Do not mention
   AWS certification preparation.
+- **No grades, marks or classifications anywhere on the site.** The
+  secondary-school diploma mark (90/100, IISS E. Majorana) was removed on
+  23 October 2026 at the operator's request. The school, the qualification
+  and the dates may stay; the mark may not come back, and no degree
+  classification, GPA or module mark may be added. "NFQ Level 7" is a
+  qualification level, not a grade, and stays.
 - The degree is the three-year NFQ Level 7 BSc in Computing Systems and
   Operations (Software Development and DevOps), completed in May 2026 and
   already awarded: write it as a degree held, never as pending, expected or

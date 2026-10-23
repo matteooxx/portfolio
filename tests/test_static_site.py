@@ -179,6 +179,11 @@ class StaticSiteTests(unittest.TestCase):
             "coursework complete",
             "(Hons)",
             "Honours",
+            # The secondary-school diploma grade came off the site on
+            # 23 October 2026, at the operator's request. The school, the
+            # qualification and the dates stay; the mark does not.
+            "90/100",
+            "final grade",
             # He lives in Italy and targets the Irish market. The site may
             # say he is moving to Ireland, studied there and needs no work
             # permit there; it may never say he is based there. That is the
